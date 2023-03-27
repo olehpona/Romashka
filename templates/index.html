@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="{{  url_for('static' , filename='styles.css') }}" rel="stylesheet">
+    
+
+</head>
+<body>
+
+
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+      <img src="https://cdn.logo.com/hotlink-ok/logo-social.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+      Ромашковий завод
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Головна</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Доставка</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link">Про нас</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+    <div id="carouselExample" class="carousel slide">
+        <div class="carousel-inner"  style="border-radius: 15px; margin-top: 2vh;">
+        <div class="carousel-item active">
+          <img src="https://greenheal.com.ua/files/uploads/romashka_lekarstvennaya.jpg" class="d-block" alt="1" style="height: 100%;min-height:200px;max-height: 400px; width:100%;">
+        </div>
+        <div class="carousel-item">
+          <img src="https://www.harbuz.info/wp-content/uploads/2018/03/rom.jpg" class="d-block" alt="2" style="height: 100%; min-height:200px;max-height: 400px;width:100%;">
+        </div>
+        <div class="carousel-item">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chamomile%40original_size.jpg/800px-Chamomile%40original_size.jpg" class="d-block" alt="3" style="height: 100%;min-height:200px;max-height: 400px;width:100%;">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    <div class="cards">
+        {% for card in cards %}
+            <div class="card" style="width: 18rem; margin-top: 2vh;margin-left: 5px; margin-right: 5px;">
+              <img src="{{card.pic_url}}" class="card-img-top" alt="..." style="height:50%;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+              <div class="card-body">
+                <h5 class="card-title">{{card.name}}</h5>
+                <p class="card-text">{{card.description}}</p>
+                  <form action="https://www.portmone.com.ua/gateway/" method="post">
+                      <input type="hidden" name="bodyRequest" value='{
+          "paymentTypes":{"gpay":"Y","card":"Y","portmone":"Y","token":"N",
+                          "clicktopay":"Y","createtokenonly":"N"},
+          "priorityPaymentTypes":{"gpay":"3","card":"2","portmone":"1",
+                                  "token":"0","clicktopay":"1","createtokenonly":"0"},
+          "payee":{"payeeId":"3048","login":"","dt":"","signature":"", "shopSiteId":""},
+          "order":{"description":"Ромашка {{card.name}}","shopOrderNumber":"SHP-00445401",
+                   "billAmount":"{{card.price}}","attribute1":"1","attribute2":"2","attribute3":"3",
+                   "attribute4":"4","attribute5":"","successUrl":"","failureUrl":"",
+                   "preauthFlag":"N","billCurrency":"UAH", "encoding":""},
+          "token":{"tokenFlag":"N","returnToken":"N","token":"","cardMask":"",
+                   "otherPaymentMethods":"Y","sellerToken":""},
+          "payer":{"lang":"uk", "emailAddress":"test@ukr.net"},
+          "style":{"type":"light","logo":"","backgroundColorHeader":"",
+                   "backgroundColorButtons":"","colorTextAndIcons":"",
+                   "borderColorList":"","bcMain":""}
+        }' />
+                      <input type="hidden" name="typeRequest" value='json' />
+                      <input type="submit" class="btn btn-outline-success" value="Купити {{card.price}} ГРН"  />
+                </form>
+              </div>
+            </div>
+        {% endfor %}
+    </div>
+
+
+</main>
+<footer class="container">
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
