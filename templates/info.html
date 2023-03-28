@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="{{  url_for('static' , filename='styles.css') }}" rel="stylesheet">
+    <script src="{{  url_for('static' , filename='script.js') }}"></script>
+
+</head>
+<body>
+
+
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+      <img src="https://cdn.logo.com/hotlink-ok/logo-social.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+      Ромашковий завод
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Головна</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Доставка</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link">Про нас</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div style="display: flex;">
+      <div id="carouselExample" class="carousel slide">
+        <div class="carousel-inner"  style="border-radius: 15px; margin-top: 2vh; width: 100vh;">
+          <div class="carousel-item active">
+            <img src="https://greenheal.com.ua/files/uploads/romashka_lekarstvennaya.jpg" class="d-block" alt="1" style="height: 100%;min-height:200px;max-height: 400px; min-width: 100%;">
+          </div>
+          <div class="carousel-item">
+            <img src="https://www.harbuz.info/wp-content/uploads/2018/03/rom.jpg" class="d-block" alt="2" style="height: 100%; min-height:200px;max-height: 400px;min-width: 100%">
+          </div>
+          <div class="carousel-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chamomile%40original_size.jpg/800px-Chamomile%40original_size.jpg" class="d-block" alt="3" style="height: 100%;min-height:200px;max-height: 400px;min-width: 100%">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    <div class="infocards" style="margin-top: 2vh; margin-left: 8vh;">
+      <div class="card" style="width: 18rem; margin-bottom: 2vh;">
+        <h5 class="card-header">Про товар</h5>
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">{{ product.description }}</p>
+          <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Купити {{ product.price }}
+          </button>   
+        </div>
+      </div>
+      <div class="card" style="width: 18rem; margin-bottom: 2vh;">
+        <h5 class="card-header">Доставка</h5>
+        <div class="card-body">
+          <h5 class="card-title"><span>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9-FcIlDncsbL-jGju1qGBPt4i0_k3UXiw7k_XmsNlBA0uwkqCLMcfkkY_v9l8l4lngdA&usqp=CAU" style="height: 15%; width:15%;">
+          </span>Нова пошта</h5>
+          <p class="card-text">Від 60 грн (+/- 3 дня)</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title"><span>
+            <img src="https://www.ukrposhta.ua/doc/for-media/logo_pin_ukrpost.jpg" style="height: 10%; width:10%;">
+          </span>Укр пошта</h5>
+          <p class="card-text">Від 30 грн (+/- 5 днів)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="Rewiews" style="width: 80vh;">
+    <div class="createRewiews">
+      <form action="/rewiew" method="post">
+        <input type="hiden" id="productid" value="{{ product.id }}">
+        <div class="mb-3">
+          <label for="InputEmail1" class="form-label">Email адрес</label>
+          <input type="email" class="form-control" id="InputEmail1">
+        </div>
+        <div class="mb-3">
+          <label for="InputPassword1" class="form-label">Оцінка</label>
+          <input type="number" class="form-control" id="InputPassword1" max="5" min="0">
+        </div>
+        <div class="mb-3">
+          <label for="detail" class="form-label">Відгук</label>
+          <textarea class="form-control" id="detail" rows="5"></textarea>
+        </div>        
+        <button type="submit" class="btn btn-primary">Надіслати</button>
+      </form>
+    </div>
+    <div class="rewiew list">
+      {% for rewiew in rewiews%}
+      <div class="card" style="width: 18rem; margin: 2vh;">
+        <div class="card-body">
+          <h5 class="card-title">Автор {{ rewiew.author }}</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">{{ rewiew.rate }}</h6>
+          <p class="card-text">{{ rewiew.detail }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+
+</main>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="Portmone" aria-hidden="true" style="height: 90vh;">
+  <div class="modal-dialog" style="height: 80%;">
+    <div class="modal-content" style="height: 100%;">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Оплата</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="height: 100%;">
+        <div class="accordion" id="accordionExample" style="height: 70%;">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Товар
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <div>
+                  <label for="count" class="form-label">Кількість</label>
+                  <input id="count" type="number" value="1">
+                </div>
+                
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Доставка
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <ul class="list-group">
+                  <li class="list-group-item">
+                    <select class="form-select" aria-label="Default select example">
+                    <option selected>Доставка</option>
+                    <option value="1">Нова Пошта</option>
+                    <option value="2">Укр Пошта</option>
+                  </select>
+                </li>
+                  <li class="list-group-item">
+                    <input type="text" class="form-control" placeholder="Вулиця бобра 29">
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item" style="height: 100%;">
+            <h2 class="accordion-header" style="height: 100%;">
+              <form action="https://www.portmone.com.ua/gateway/" id="payform" method="post" target="Pay">
+                <input type="hidden" name="bodyRequest" id="paydata" value='' />
+                <input type="hidden" name="typeRequest" value='json' />
+                <button class="accordion-button collapsed" type="button" onclick='GetPay("{{ product.price }}" , "{{ product.id }}" , "{{ product.name }}")' data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  Оплата
+                </button>
+              </form>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample" style="height:100%;">
+              <div class="accordion-body" style="height:100%;">
+                <div style="height: 100%;">
+                  <iframe name="Pay" width="100%" height="200%"  frameborder="0" ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<footer class="container">
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>

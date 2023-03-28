@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template , request
 from flask_sqlalchemy import SQLAlchemy
 import json
 db = SQLAlchemy()
@@ -34,9 +34,24 @@ class Chamomile(db.Model):
 @app.route("/")  # Вказуємо url-адресу для виклику функції
 def index():
     with app.app_context():
+
         return render_template('index.html' , cards=Chamomile.query.all())  # Результат, що повертається у браузер
 
+@app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
+def product(id):
+    with app.app_context():
+        rewiew = [{
+            "author" : "Степанко",
+            "rate" : "-3",
+            "detail" : "Aboba"
+        }]
+        return render_template('info.html', product=Chamomile.query.get(int(id)) , rewiews = rewiew)  # Результат, що повертається у браузер
 
+@app.route("/rewiew" , methods=['POST'])  # Вказуємо url-адресу для виклику функції
+def rewiew():
+    data = request.get_json()
+    print(data)
+    return data
 if __name__ == "__main__":
 
     app.config['TEMPLATES_AUTO_RELOAD'] = True
