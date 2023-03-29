@@ -25,7 +25,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Головна</a>
+          <a class="nav-link active" aria-current="page" href="/">Головна</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Доставка</a>
@@ -67,9 +67,8 @@
         <div class="card-body">
           <h5 class="card-title">{{ product.name }}</h5>
           <p class="card-text">{{ product.description }}</p>
-          <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Купити {{ product.price }}
-          </button>   
+          <a href="/checkout/{{ product.id }}" class="btn btn-outline-success">Купити {{ product.price }}</a>
+            
         </div>
       </div>
       <div class="card" style="width: 18rem; margin-bottom: 2vh;">
@@ -91,28 +90,27 @@
   </div>
   <div class="Rewiews" style="width: 80vh;">
     <div class="createRewiews">
-      <form action="/rewiew" method="post">
-        <input type="hiden" id="productid" value="{{ product.id }}">
+      <form method="post">
         <div class="mb-3">
-          <label for="InputEmail1" class="form-label">Email адрес</label>
-          <input type="email" class="form-control" id="InputEmail1">
+          <label for="Email" class="form-label">Email адрес</label>
+          <input type="email" class="form-control" id="Email">
         </div>
         <div class="mb-3">
-          <label for="InputPassword1" class="form-label">Оцінка</label>
-          <input type="number" class="form-control" id="InputPassword1" max="5" min="0">
+          <label for="Rate" class="form-label">Оцінка</label>
+          <input type="number" class="form-control" id="Rate" max="5" min="0">
         </div>
         <div class="mb-3">
           <label for="detail" class="form-label">Відгук</label>
           <textarea class="form-control" id="detail" rows="5"></textarea>
         </div>        
-        <button type="submit" class="btn btn-primary">Надіслати</button>
+        <button type="button" onclick="sendRewiew('{{ product.id }}')" class="btn btn-primary">Надіслати</button>
       </form>
     </div>
-    <div class="rewiew list">
+    <div class="rewiew list" style="display:inline-table;">
       {% for rewiew in rewiews%}
-      <div class="card" style="width: 18rem; margin: 2vh;">
+      <div class="card" style="width: 80vh; margin-top: 5vh;">
         <div class="card-body">
-          <h5 class="card-title">Автор {{ rewiew.author }}</h5>
+          <h5 class="card-title">Автор {{ rewiew.email }}</h5>
           <h6 class="card-subtitle mb-2 text-body-secondary">{{ rewiew.rate }}</h6>
           <p class="card-text">{{ rewiew.detail }}</p>
         </div>
@@ -124,81 +122,7 @@
 
 </main>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="Portmone" aria-hidden="true" style="height: 90vh;">
-  <div class="modal-dialog" style="height: 80%;">
-    <div class="modal-content" style="height: 100%;">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Оплата</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="height: 100%;">
-        <div class="accordion" id="accordionExample" style="height: 70%;">
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Товар
-              </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <div>
-                  <label for="count" class="form-label">Кількість</label>
-                  <input id="count" type="number" value="1">
-                </div>
-                
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Доставка
-              </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <ul class="list-group">
-                  <li class="list-group-item">
-                    <select class="form-select" aria-label="Default select example">
-                    <option selected>Доставка</option>
-                    <option value="1">Нова Пошта</option>
-                    <option value="2">Укр Пошта</option>
-                  </select>
-                </li>
-                  <li class="list-group-item">
-                    <input type="text" class="form-control" placeholder="Вулиця бобра 29">
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item" style="height: 100%;">
-            <h2 class="accordion-header" style="height: 100%;">
-              <form action="https://www.portmone.com.ua/gateway/" id="payform" method="post" target="Pay">
-                <input type="hidden" name="bodyRequest" id="paydata" value='' />
-                <input type="hidden" name="typeRequest" value='json' />
-                <button class="accordion-button collapsed" type="button" onclick='GetPay("{{ product.price }}" , "{{ product.id }}" , "{{ product.name }}")' data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                  Оплата
-                </button>
-              </form>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample" style="height:100%;">
-              <div class="accordion-body" style="height:100%;">
-                <div style="height: 100%;">
-                  <iframe name="Pay" width="100%" height="200%"  frameborder="0" ></iframe>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <footer class="container">
