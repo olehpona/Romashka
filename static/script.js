@@ -1,130 +1,233 @@
 let sum = 0
 
-function GetPay(price,pic,name ){
-    document.getElementById('Pay').innerHTML = '';
-    if (document.getElementById('payMethod').selectedOptions[0].innerHTML == 'Portmone'){
-        sum = Number(price)*Number(document.getElementById('count').value);
-        let data = {
-            "paymentTypes":{"gpay":"Y","card":"Y","portmone":"Y","token":"N",
-                            "clicktopay":"Y","createtokenonly":"N"},
-            "priorityPaymentTypes":{"gpay":"3","card":"3","portmone":"1",
-                                    "token":"0","clicktopay":"0","createtokenonly":"0"},
-            "payee":{"payeeId":"3048","login":"","dt":"","signature":"", "shopSiteId":""},
-            "order":{"description":"Ромашка " + name,"shopOrderNumber":"SHP-00445401",
-                     "billAmount":sum.toString(),"attribute1":"1","attribute2":"2","attribute3":"3",
-                     "attribute4":"4","attribute5":"","successUrl":"","failureUrl":"",
-                     "preauthFlag":"N","billCurrency":"UAH", "encoding":""},
-            "token":{"tokenFlag":"N","returnToken":"N","token":"","cardMask":"",
-                     "otherPaymentMethods":"Y","sellerToken":""},
-            "payer":{"lang":"uk", "emailAddress":"test@ukr.net"},
-            "style":{"type":"light","logo":"","backgroundColorHeader":"",
-                     "backgroundColorButtons":"","colorTextAndIcons":"",
-                     "borderColorList":"","bcMain":""}
-            }
-        document.getElementById('paydata').value = JSON.stringify(data);
+function GetPay(price, pic, name) {
+    // Clear the payment information.
+    const paymentElement = document.getElementById('Pay');
+    paymentElement.innerHTML = '';
+
+    // Determine the selected payment method.
+    const paymentType = document.getElementById('payMethod').selectedOptions[0].innerHTML;
+
+    // Build the payment data object.
+    const paymentData = {
+        paymentTypes: {
+            gpay: 'Y',
+            card: 'Y',
+            portmone: 'Y',
+            token: 'N',
+            clicktopay: 'Y',
+            createtokenonly: 'N',
+        },
+        priorityPaymentTypes: {
+            gpay: '3',
+            card: '3',
+            portmone: '1',
+            token: '0',
+            clicktopay: '0',
+            createtokenonly: '0',
+        },
+        payee: {
+            payeeId: '3048',
+            login: '',
+            dt: '',
+            signature: '',
+            shopSiteId: '',
+        },
+        order: {
+            description: `Ромашка ${name}`,
+            shopOrderNumber: 'SHP-00445401',
+            billAmount: (Number(price) * Number(document.getElementById('count').value)).toString(),
+            attribute1: '1',
+            attribute2: '2',
+            attribute3: '3',
+            attribute4: '4',
+            attribute5: '',
+            successUrl: '',
+            failureUrl: '',
+            preauthFlag: 'N',
+            billCurrency: 'UAH',
+            encoding: '',
+        },
+        token: {
+            tokenFlag: 'N',
+            returnToken: 'N',
+            token: '',
+            cardMask: '',
+            otherPaymentMethods: 'Y',
+            sellerToken: '',
+        },
+        payer: {
+            lang: 'uk',
+            emailAddress: 'test@ukr.net',
+        },
+        style: {
+            type: 'light',
+            logo: '',
+            backgroundColorHeader: '',
+            backgroundColorButtons: '',
+            colorTextAndIcons: '',
+            borderColorList: '',
+            bcMain: '',
+        },
+    };
+
+    // Take action based on the selected payment method.
+    if (paymentType === 'Portmone') {
+        // Submit the payment form for Portmone.
+        document.getElementById('paydata').value = JSON.stringify(paymentData);
         document.getElementById('payform').submit();
-    }   else if (document.getElementById('payMethod').selectedOptions[0].innerHTML == 'Mono'){
-        document.getElementById('Pay').src = pic;
-    }   else {
-        document.getElementById('Pay').innerHTML = 'Оплачено';
+    } else if (paymentType === 'Mono') {
+        // Display the Mono payment image.
+        paymentElement.src = pic;
+    } else {
+        // Display that the payment has been made.
+        paymentElement.innerHTML = 'Оплачено';
     }
-
-
 }
 
-function changeAllInAll(){
-    try{
-        let service = document.getElementById('PostService').selectedOptions[0].innerHTML;
+
+async function getPostOffices(cityName) {
+  try {
+    const response = await fetch(`https://api.ukrposhta.ua/address-classifier-ws/1.0/address/search-settlement?search=${cityName}&postcode=&admin_name=&language=en`, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      const settlement = data[0];
+      const postOfficeResponse = await fetch(`https://api.ukrposhta.ua/address-classifier-ws/1.0/address/search-postoffice?settlementId=${settlement.id}&postcode=&language=en`, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      const postOffices = await postOfficeResponse.json();
+
+      if (postOffices && postOffices.length > 0) {
+        return postOffices.map(po => `${po.index} - ${po.name}`);
+      } else {
+        return 'Відділення пошти не знайдені';
+      }
+    } else {
+      return 'Місто не знайдено';
+    }
+  } catch (error) {
+    console.error(error);
+    return 'Сталася помилка при виконанні запиту';
+  }
+}
+
+function changeAllInAll() {
+    let service = document.getElementById('PostService').selectedOptions[0].innerHTML;
+    if (service) {
         document.getElementById('postServiceD').innerHTML = service;
     }
-    catch {
-        console.error('ABOBA ALERT')
-    }
-    try{
-        let city = document.getElementById('City').value;
+
+    let city = document.getElementById('City').value;
+    if (city) {
         document.getElementById('postCityD').innerHTML = city;
     }
-    catch {
-        console.error('ABOBA ALERT')
-    }
-    try {
-        let point = document.getElementById('point').selectedOptions[0].innerHTML;
+
+    let point = document.getElementById('point').selectedOptions[0].innerHTML;
+    if (point) {
         document.getElementById('postPoinD').innerHTML = point;
     }
-    catch (e){
-        console.error(e)
-    }
-    try {
-        let count = document.getElementById('count').value;
+
+    let count = document.getElementById('count').value;
+    if (count) {
         document.getElementById('countD').innerHTML = count;
     }
-    catch{
-        console.error('ABOBA ALERT')
-    }
-    try{
-        let sum = Number(document.getElementById('price').value)*Number(document.getElementById('count').value);
+
+    let price = Number(document.getElementById('price').value);
+    if (price) {
+        let sum = price * count;
         document.getElementById('sumD').innerHTML = sum;
     }
-    catch {
-        console.error('ABOBA ALERT')
-    }
-    try {
-        let client = document.getElementById('client').value;
+
+    let client = document.getElementById('client').value;
+    if (client) {
         document.getElementById('clientD').innerHTML = client;
     }
-    catch{
-        console.error('ABOBA ALERT')
-    }
-
 }
 
 
-function sendRewiew(id){
-    var data = {
-        "id" : id,
-        "email" : document.getElementById('Email').value,
-        "review" : document.getElementById('detail').value,
-        "rate" : document.getElementById('Rate').value
-    }
-    var sock = new XMLHttpRequest();
-    sock.open("POST" , window.location.origin + '/review/' + id , true);
-    console.log(window.location.origin + '/review/' + id)
-    sock.setRequestHeader("Content-Type", "application/json");
-    sock.onreadystatechange = function () {
-        if (sock.readyState === 4 && sock.status === 200) {
-            console.log('OK');
-        }
-    }
-    sock.send(JSON.stringify(data))
+function sendReview(id) {
+  const data = {
+    id: id,
+    email: document.getElementById('Email').value,
+    review: document.getElementById('detail').value,
+    rate: document.getElementById('Rate').value
+  };
+
+  postReview(data)
+    .then(() => {
+      console.log('OK');
+    })
+    .catch(error => {
+      console.error(error);
+      alert('Під час відправки відгуку сталася помилка!');
+    });
+}
+
+async function postReview(data) {
+  const response = await fetch(`/review/${data.id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error('Сталася помилка під час відправки запиту на сервер!');
+  }
 }
 
 
-async function getPoint(value){
-    let select = document.getElementById('point')
-    select.innerHTML = '';
-    let data = {
-        "apiKey": "3270f929a4f77936d060671f12818552",
-        "modelName": "Address",
-        "calledMethod": "getWarehouses",
-        "methodProperties": {"CityName" : value,"Language" : "UA"}
-     }
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", 'https://api.novaposhta.ua/v2.0/json/', true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            JSON.parse(xhr.responseText)["data"].forEach(function(element){
-                var opt = document.createElement('option');
-                opt.value = element['Description'];
-                opt.innerHTML = element['Description'];
-                select.appendChild(opt);
-            })
-        }
-    };
-    xhr.send(JSON.stringify(data));
+async function getPoint(value) {
+  const select = document.getElementById('point');
+  select.innerHTML = '';
+
+  const data = {
+    "apiKey": "3270f929a4f77936d060671f12818552",
+    "modelName": "Address",
+    "calledMethod": "getWarehouses",
+    "methodProperties": {"CityName" : value,"Language" : "UA"}
+  };
+
+  try {
+    const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const json = await response.json();
+
+    if (json.success) {
+      const warehouses = json.data.map(({ Description }) => Description);
+
+      warehouses.forEach((description) => {
+        const option = document.createElement('option');
+        option.value = description;
+        option.innerHTML = description;
+        select.appendChild(option);
+      });
+    } else {
+      throw new Error(json.errors[0].errorMessage);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
-changePostService(document.getElementById('PostService'))
+
+
 
 function changePostService(element){
     if (element.selectedOptions[0].innerHTML == 'Нова Пошта'){
@@ -138,3 +241,4 @@ function changePostService(element){
         document.getElementById("UkrPost").style.display = 'none';     
     }
 }
+changePostService(document.getElementById('PostService'))
