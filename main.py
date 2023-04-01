@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import json
+import ssl
+context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+context.load_cert_chain('supadupa_security/cert.pem' , keyfile='supadupa_security/key.pem' , password='aboba')
+
 
 db = SQLAlchemy()
 
@@ -67,6 +71,6 @@ def checkout(id):
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(debug=True)  # Запускаємо веб-сервер з цього файлу
+    app.run(debug=True ,ssl_context=context)  # Запускаємо веб-сервер з цього файлу
 
 #3270f929a4f77936d060671f12818552

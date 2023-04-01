@@ -1,4 +1,5 @@
-let sum = 0
+
+
 
 function GetPay(price, pic, name) {
     // Clear the payment information.
@@ -81,7 +82,7 @@ function GetPay(price, pic, name) {
         paymentElement.src = pic;
     } else {
         // Display that the payment has been made.
-        paymentElement.innerHTML = 'Оплачено';
+        paymentElement.src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
     }
 }
 
@@ -242,3 +243,20 @@ function changePostService(element){
     }
 }
 changePostService(document.getElementById('PostService'))
+
+function encryptdata(data){
+  let key =`-----BEGIN PUBLIC KEY-----
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA+MrbR5eH/533ciY0IaqY
+  ZfKuOHCsYqq2FifdrpzY4NaqTEdRPB5kwAIYI+0nLnXrSyc66Na9k9QwRzl6ggQ5
+  5nWTqWHmZ95xrfPnJAo5xi/qrGLeT0B2OaGWP3cl3Z0clmLo78k36X3R70rzzwBT
+  S7L2FSUTPyK3NhA5cXgrGsMP6+BKMqbqnderWM0dZyP0uKqTkj1nZ6XDlo4O9aGO
+  E8R7Paaew+6T/UhP86QTRFshe1OSmHIUQzhixMRI0OZV2mBLdGlx4R0wQVErS7Vq
+  iXU7bCi6/pazfPmK1MA/N/f/svfuenszCTG7LuF03tmJIPx5jRaNHa1iEoC9EG0l
+  ewIDAQAB
+  -----END PUBLIC KEY-----`;
+  
+  var encrypt = new JSEncrypt();
+  encrypt.setPublicKey(key);
+  var ciphertext = encrypt.encrypt(data);
+  console.log(ciphertext)
+}
