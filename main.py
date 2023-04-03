@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import json
 import ssl
-context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-context.load_cert_chain('supadupa_security/cert.pem' , keyfile='supadupa_security/key.pem' , password='aboba')
+from werkzeug.security import generate_password_hash, check_password_hash
+from Cryptodome.Random import get_random_bytes
 
+context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+context.load_cert_chain('supadupa_security/cert.pem', keyfile='supadupa_security/key.pem', password='aboba')
 
 db = SQLAlchemy()
 
@@ -12,6 +14,7 @@ app = Flask(__name__)  # Створюємо веб–додаток Flask
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 
 
@@ -36,10 +39,18 @@ class Chamomile(db.Model):
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    product_id = db.Column(db.Integer,  nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
     detail = db.Column(db.Text, nullable=True)
     rate = db.Column(db.Integer, nullable=False)
+
+
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    login = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    tel = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
 
 
 @app.route("/")  # Вказуємо url-адресу для виклику функції
@@ -65,12 +76,54 @@ def review(id):
         db.session.commit()
         return 'OK'
 
+
+@app.route('/accounts', methods=['POST', 'GET'])
+def accounts():
+    if request.method == 'GET':
+        return 'NOT ALLOWED'
+    else:
+        geted = request.get_json()
+        data = geted['body']
+        if geted['type'] == 'create':
+            if Users.query.filter_by(email=data['email']).first():
+                flash('Такий користувач уже існує', category='alert-danger')
+                return 'BAD'
+            else:
+                with app.app_context():
+                    print(data)
+                    user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
+                                 email=data['email'])
+                    db.session.add(user)
+                    db.session.commit()
+            return generate_password_hash(data['password'])
+        else:
+            if Users.query.filter_by(email=data['email']).first():
+                if check_password_hash(Users.quary.filter_by(email=data['email']).first()['password'],
+                                       data['password']):
+                    return 'OK'
+                else:
+                    return 'BAD'
+            else:
+                return 'BAD'
+
+
+@app.route('/accounts/signin', methods=['GET'])
+def signin():
+    return render_template('signin.html')
+
+
+@app.route('/accounts/signup', methods=["GET"])
+def signup():
+    return render_template('signup.html')
+
+
 @app.route("/checkout/<id>")
 def checkout(id):
-    return render_template('checkout.html' , product=Chamomile.query.get(int(id)))
+    return render_template('checkout.html', product=Chamomile.query.get(int(id)))
+
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(debug=True ,ssl_context=context)  # Запускаємо веб-сервер з цього файлу
+    app.run(debug=True, ssl_context=context)  # Запускаємо веб-сервер з цього файлу
 
-#3270f929a4f77936d060671f12818552
+# 3270f929a4f77936d060671f12818552

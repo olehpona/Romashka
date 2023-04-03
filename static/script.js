@@ -11,64 +11,64 @@ function GetPay(price, pic, name) {
 
     // Build the payment data object.
     const paymentData = {
-        paymentTypes: {
-            gpay: 'Y',
-            card: 'Y',
-            portmone: 'Y',
-            token: 'N',
-            clicktopay: 'Y',
-            createtokenonly: 'N',
+        'paymentTypes': {
+            'gpay': 'Y',
+            'card': 'Y',
+            'portmone': 'Y',
+            'token': 'N',
+            'clicktopay': 'Y',
+            'createtokenonly': 'N',
         },
-        priorityPaymentTypes: {
-            gpay: '3',
-            card: '3',
-            portmone: '1',
-            token: '0',
-            clicktopay: '0',
-            createtokenonly: '0',
+        'priorityPaymentTypes': {
+            'gpay': '3',
+            'card': '3',
+            'portmone': '1',
+            'token': '0',
+            'clicktopay': '0',
+            'createtokenonly': '0',
         },
-        payee: {
-            payeeId: '3048',
-            login: '',
-            dt: '',
-            signature: '',
-            shopSiteId: '',
+        'payee': {
+            'payeeId': '3048',
+            'login': '',
+            'dt': '',
+            'signature': '',
+            'shopSiteId': '',
         },
-        order: {
-            description: `Ромашка ${name}`,
-            shopOrderNumber: 'SHP-00445401',
-            billAmount: (Number(price) * Number(document.getElementById('count').value)).toString(),
-            attribute1: '1',
-            attribute2: '2',
-            attribute3: '3',
-            attribute4: '4',
-            attribute5: '',
-            successUrl: '',
-            failureUrl: '',
-            preauthFlag: 'N',
-            billCurrency: 'UAH',
-            encoding: '',
+        'order': {
+            'description': `Ромашка ${name}`,
+            'shopOrderNumber': 'SHP-00445401',
+            'billAmount': (Number(price) * Number(document.getElementById('count').value)).toString(),
+            'attribute1': '1',
+            'attribute2': '2',
+            'attribute3': '3',
+            'attribute4': '4',
+            'attribute5': '',
+            'successUrl': '',
+            'failureUrl': '',
+            'preauthFlag': 'N',
+            'billCurrency': 'UAH',
+            'encoding': '',
         },
-        token: {
-            tokenFlag: 'N',
-            returnToken: 'N',
-            token: '',
-            cardMask: '',
-            otherPaymentMethods: 'Y',
-            sellerToken: '',
+        'token': {
+            'tokenFlag': 'N',
+            'returnToken': 'N',
+            'token': '',
+            'cardMask': '',
+            'otherPaymentMethods': 'Y',
+            'sellerToken': '',
         },
-        payer: {
-            lang: 'uk',
-            emailAddress: 'test@ukr.net',
+        'payer': {
+            'lang': 'uk',
+            'emailAddress': 'test@ukr.net',
         },
-        style: {
-            type: 'light',
-            logo: '',
-            backgroundColorHeader: '',
-            backgroundColorButtons: '',
-            colorTextAndIcons: '',
-            borderColorList: '',
-            bcMain: '',
+        'style': {
+            'type': 'light',
+            'logo': '',
+            'backgroundColorHeader': '',
+            'backgroundColorButtons': '',
+            'colorTextAndIcons': '',
+            'borderColorList': '',
+            'bcMain': '',
         },
     };
 
@@ -227,8 +227,110 @@ async function getPoint(value) {
   }
 }
 
+async function signup(){
+  user = document.getElementById('inputName').value;
+  email = document.getElementById('inputEmail').value;
+  tel = document.getElementById('inputPhone').value;
+  pass1 = document.getElementById('inputPassword').value;
+  pass2 = document.getElementById('confirmPassword').value;
+  alert = document.getElementById('alertjs')
+  if (pass1 == pass2 && user != '' && email !='' && tel !='' && pass1 != ''){
+    alert.style.display = 'none';
+    var data = {
+      'type':'create',
+      'body':{
+      'user': user,
+      'email': email,
+      'tel': tel,
+      'password' : pass1
+      }}
+    const response = await fetch(`/accounts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+    });
+     if (!response.ok) {
+      alert.style.display = 'block';
+      alert.innerHTML = 'Сталася помилка на сервері. Спробуйте пізніше.'
+     }  else {
+      let text = await response.text();
+     console.log(text)
+        if (text == 'BAD'){
+            window.location.reload();
+        }   else{
+            setCookie('email' , email , 20);
+            setCookie('password' , text , 20);
+            window.location.reload('/');
+        }
+     }
+  } else{
+    alert.style.display = 'block';
+    alert.innerHTML = 'Перевір правильність даних!'
+  }
 
+}
 
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+async function chackUser(){
+  const email = await getCookie('email');
+  const password = await getCookie('password');
+  if (email != '' && password != ''){
+    var data = {
+      'type':'create',
+      'body':{
+      'email': email,
+      'password' : password
+      }}
+    const response = await fetch(`/accounts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+      if (!response.ok) {
+        alert.style.display = 'block';
+        alert.innerHTML = 'Сталася помилка на сервері. Спробуйте пізніше.'
+      }  else {
+        let text = await response.text();
+        console.log(text)
+          if (text == 'BAD'){
+            window.sessionStorage.setItem()
+          }   else{
+              setCookie('email' , email , 20);
+              setCookie('password' , text , 20);
+              window.location.reload('/');
+          }
+      }
+    } else{
+      alert.style.display = 'block';
+      alert.innerHTML = 'Перевір правильність даних!'
+    }
+  }
 
 function changePostService(element){
     if (element.selectedOptions[0].innerHTML == 'Нова Пошта'){
@@ -244,19 +346,3 @@ function changePostService(element){
 }
 changePostService(document.getElementById('PostService'))
 
-function encryptdata(data){
-  let key =`-----BEGIN PUBLIC KEY-----
-  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA+MrbR5eH/533ciY0IaqY
-  ZfKuOHCsYqq2FifdrpzY4NaqTEdRPB5kwAIYI+0nLnXrSyc66Na9k9QwRzl6ggQ5
-  5nWTqWHmZ95xrfPnJAo5xi/qrGLeT0B2OaGWP3cl3Z0clmLo78k36X3R70rzzwBT
-  S7L2FSUTPyK3NhA5cXgrGsMP6+BKMqbqnderWM0dZyP0uKqTkj1nZ6XDlo4O9aGO
-  E8R7Paaew+6T/UhP86QTRFshe1OSmHIUQzhixMRI0OZV2mBLdGlx4R0wQVErS7Vq
-  iXU7bCi6/pazfPmK1MA/N/f/svfuenszCTG7LuF03tmJIPx5jRaNHa1iEoC9EG0l
-  ewIDAQAB
-  -----END PUBLIC KEY-----`;
-  
-  var encrypt = new JSEncrypt();
-  encrypt.setPublicKey(key);
-  var ciphertext = encrypt.encrypt(data);
-  console.log(ciphertext)
-}
