@@ -231,7 +231,7 @@ async function signup() {
     pass1 = document.getElementById('inputPassword').value;
     pass2 = document.getElementById('confirmPassword').value;
     alert = document.getElementById('alertjs')
-    if (pass1 == pass2 && user != '' && email != '' && tel != '' && pass1 != '') {
+    if (pass1 === pass2 && user !== '' && email !== '' && tel !== '' && pass1 !== '') {
         alert.style.display = 'none';
         var data = {
             'type': 'create',
@@ -259,8 +259,10 @@ async function signup() {
                 window.location.reload();
             } else {
                 setCookie('email', email, 20);
-                setCookie('password', text, 20);
-                window.location.reload('/');
+                setCookie('user', user, 20);
+                alert.style.display = 'block';
+                alert.className = 'alert alert-success';
+                alert.innerHTML = 'Перевір скриньку! Здається там лист!'
             }
         }
     } else {
@@ -293,12 +295,44 @@ function getCookie(cname) {
     return "";
 }
 
-async function chackUser() {
+async function signin() {
+    const email = document.getElementById('inputEmail').value;
+    const password = document.getElementById('inputPassword').value;
+    setCookie('email', email, 20);
+    await checkUser('login' , password);
+}
+
+function preparePage() {
+    if (sessionStorage.getItem("isLogged") === "true") {
+        document.getElementById('login_btn').style.display = 'none';
+        document.getElementById('login_user').style.display = 'flex'
+        document.getElementById('uname').innerHTML = getCookie('user');
+    } else {
+        const returned = checkUser('check')
+        console.log( returned)
+        if (returned === "OK") {
+            document.getElementById('login_btn').style.display = 'none';
+            document.getElementById('login_user').style.display = 'flex'
+            document.getElementById('uname').innerHTML = getCookie('user');
+        } else {
+            document.getElementById('login_btn').style.display = 'flex';
+            document.getElementById('login_user').style.display = 'none'
+        }
+    }
+}
+
+async function checkUser(mode , pass) {
     const email = await getCookie('email');
-    const password = await getCookie('password');
-    if (email != '' && password != '') {
+    const alert = document.getElementById('alertjs')
+    let password ='';
+    if (mode === 'login'){
+        password = pass;
+    } else{
+        password = await getCookie('password');
+    }
+    if (email !== '' && password !== '') {
         var data = {
-            'type': 'create',
+            'type': mode,
             'body': {
                 'email': email,
                 'password': password
@@ -312,22 +346,34 @@ async function chackUser() {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            alert.style.display = 'block';
-            alert.innerHTML = 'Сталася помилка на сервері. Спробуйте пізніше.'
+            if (alert) {
+                alert.style.display = 'block';
+                alert.innerHTML = 'Сталася помилка на сервері. Спробуйте пізніше.'
+            }
         } else {
-            let text = await response.text();
+            let text = await JSON.parse(await response.text());
             console.log(text)
-            if (text == 'BAD') {
-                window.sessionStorage.setItem()
+            if (text === 'BAD') {
+                console.log('BAD KEY');
+                sessionStorage.removeItem("isLogged");
+                return "BAD"
             } else {
-                setCookie('email', email, 20);
-                setCookie('password', text, 20);
-                window.location.reload('/');
+                if (document.getElementById('rememberMe').checked) {
+                    setCookie('email', email, 20);
+                    setCookie('user', text['user'], 20);
+                    setCookie('password', text['password'], 20);
+                }
+                sessionStorage.setItem("isLogged", 'true');
+                window.location.replace(window.location.origin)
+                return "OK"
             }
         }
     } else {
-        alert.style.display = 'block';
-        alert.innerHTML = 'Перевір правильність даних!'
+        if (alert) {
+            alert.style.display = 'block';
+            alert.innerHTML = 'Користувача не знайдено!'
+            return "BAD"
+        }
     }
 }
 

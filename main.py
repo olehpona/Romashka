@@ -4,9 +4,12 @@ import json
 import ssl
 from werkzeug.security import generate_password_hash, check_password_hash
 from Cryptodome.Random import get_random_bytes
+import extra
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS)
 context.load_cert_chain('supadupa_security/cert.pem', keyfile='supadupa_security/key.pem', password='aboba')
+
+tmp_users = {}
 
 db = SQLAlchemy()
 
@@ -86,26 +89,44 @@ def accounts():
         data = geted['body']
         if geted['type'] == 'create':
             if Users.query.filter_by(email=data['email']).first():
-                flash('Такий користувач уже існує', category='alert-danger')
+                flash('Такий аккаунт уже існує!', 'alert-danger')
                 return 'BAD'
             else:
-                with app.app_context():
-                    print(data)
-                    user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
-                                 email=data['email'])
-                    db.session.add(user)
-                    db.session.commit()
-            return generate_password_hash(data['password'])
-        else:
-            if Users.query.filter_by(email=data['email']).first():
-                if check_password_hash(Users.quary.filter_by(email=data['email']).first()['password'],
-                                       data['password']):
-                    return 'OK'
+                tmp_users[data['email']] = data
+                extra.send_mail(data['email'])
+                print(tmp_users)
+                return 'OK'
+        elif geted['type'] == 'login':
+            print(geted)
+            with app.app_context():
+                if Users.query.filter_by(email=data['email']).first():
+                    if check_password_hash(Users.query.filter_by(email=data['email']).first().password,
+                                           data['password']):
+                        return {'password':Users.query.filter_by(email=data['email']).first().password, 'user' : Users.query.filter_by(email=data['email']).first().login}
+                    else:
+                        return 'BAD'
                 else:
                     return 'BAD'
-            else:
-                return 'BAD'
-
+        else:
+            print(geted)
+            with app.app_context():
+                if Users.query.filter_by(email=data['email']).first():
+                    if Users.query.filter_by(email=data['email']).first().password == data['password']:
+                        return {'password':Users.query.filter_by(email=data['email']).first().password, 'user' : Users.query.filter_by(email=data['email']).first().login}
+                    else:
+                        return 'BAD'
+                else:
+                    return 'BAD'
+@app.route('/accounts/confirm/<email>', methods=['GET'])
+def confirm(email):
+    data = tmp_users[email]
+    with app.app_context():
+        print(data)
+        user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
+                     email=data['email'])
+        db.session.add(user)
+        db.session.commit()
+    return redirect('/accounts/signin')
 
 @app.route('/accounts/signin', methods=['GET'])
 def signin():
