@@ -1,15 +1,17 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
+from email.header import Header
 
 def send_mail(email):
     sender_email = 'flowerfactory@ukr.net'
     receiver_email = email
     password = "uipSo7xmCozBbXdj"
 
-    message = MIMEMultipart("alternative")
+    message = MIMEMultipart('alternative')
     message["Subject"] = "Підтвердження Email"
-    message["From"] = sender_email
+    message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
     message["To"] = receiver_email
     text = f"""\
     Привіт. Як ся маєш?
@@ -24,10 +26,10 @@ def send_mail(email):
 <main class="container">
     <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
         <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
-        <p>Привіт! Як ся маєш?<br>
+        <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
         Ти бажав зареєструватися на нашім сайті, хіба ні?<br>
-        <a href="https://127.0.0.1:5000/accounts/confirm/{email}" class="btn btn-info" style="margin-top: 15px;">Це посилання для підтвердження</a>
         </p>
+        <a style="font-size: 15px;" href="https://127.0.0.1:5000/accounts/confirm/{email}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
     </div>
 </main>
 </body>

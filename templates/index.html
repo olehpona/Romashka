@@ -67,7 +67,7 @@
         <span class="visually-hidden">Next</span>
       </button>
     </div>
-    <div class="cards">
+    <div class="cards" style="display: flex; flex-wrap: wrap; justify-content: center;">
         {% for card in cards %}
             <div class="card" style="width: 18rem; margin-top: 2vh;margin-left: 5px; margin-right: 5px;">
               <img src="{{card.pic_url}}" class="card-img-top" alt="..." style="height:50%;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
