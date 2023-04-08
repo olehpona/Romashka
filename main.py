@@ -1,26 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-import json
 import ssl
 from werkzeug.security import generate_password_hash, check_password_hash
 from Cryptodome.Random import get_random_bytes
-import extra
+import email_management
+import stripe
+
+stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-context.load_cert_chain('supadupa_security/cert.pem', keyfile='supadupa_security/key.pem', password='aboba')
+context.load_cert_chain('security/cert.pem', keyfile='security/key.pem', password='aboba')
 
 tmp_users = {}
 
 db = SQLAlchemy()
 
-app = Flask(__name__)  # Створюємо веб–додаток Flask
-
+app = Flask(__name__,)  # Створюємо веб–додаток Flask
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 
 
+#models
 class Chamomile(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -28,16 +31,9 @@ class Chamomile(db.Model):
     description = db.Column(db.Text)
     type = db.Column(db.String, nullable=False)
     pic_url = db.Column(db.String)
+    stripe_price = db.Column(db.String , nullable=False)
 
-    def __rrpr__(self):
-        return json.dumps({
-            "name": self.name,
-            "description": self.description,
-            "type": self.type,
-            "id": self.id,
-            "price": self.price,
-            "pic": self.pic_url
-        })
+
 
 
 class Review(db.Model):
@@ -55,7 +51,7 @@ class Users(db.Model):
     tel = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
 
-
+#routes
 @app.route("/")  # Вказуємо url-адресу для виклику функції
 def index():
     with app.app_context():
@@ -70,7 +66,7 @@ def product(id):
                                rewiews=review)  # Результат, що повертається у браузер
 
 
-@app.route("/review/<id>", methods=['POST'])  # Вказуємо url-адресу для виклику функції
+@app.route("/api/review/<id>", methods=['POST'])  # Вказуємо url-адресу для виклику функції
 def review(id):
     with app.app_context():
         data = request.get_json()
@@ -80,7 +76,37 @@ def review(id):
         return 'OK'
 
 
-@app.route('/accounts', methods=['POST', 'GET'])
+@app.route('/api/pay', methods=['POST'])
+def create_pay_session():
+    data = request.get_json()
+    print(data)
+    checkout_session = stripe.checkout.Session.create(
+        line_items=[
+            {
+                # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                'price': Chamomile.query.filter_by(id=data['id']).first().stripe_price,
+                'quantity': data['count'],
+            },
+        ],
+        mode='payment',
+        custom_text={
+            "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
+        },
+        success_url='https://127.0.0.1:5000/',
+        cancel_url=f'https://127.0.0.1:5000/checkout/{data["id"]}'
+    )
+    print(checkout_session.url)
+    return checkout_session.url
+
+
+@app.route('/api/pay/success')
+def pay_success():
+    flash('Транс-акція пройшла успаішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
+          'alert-success')
+    return redirect('/')
+
+
+@app.route('/api/accounts', methods=['POST', 'GET'])
 def accounts():
     if request.method == 'GET':
         return 'NOT ALLOWED'
@@ -93,7 +119,7 @@ def accounts():
                 return 'BAD'
             else:
                 tmp_users[data['email']] = data
-                extra.send_mail(data['email'])
+                email_management.send_mail(data['email'])
                 print(tmp_users)
                 return 'OK'
         elif geted['type'] == 'login':
@@ -102,7 +128,8 @@ def accounts():
                 if Users.query.filter_by(email=data['email']).first():
                     if check_password_hash(Users.query.filter_by(email=data['email']).first().password,
                                            data['password']):
-                        return {'password':Users.query.filter_by(email=data['email']).first().password, 'user' : Users.query.filter_by(email=data['email']).first().login}
+                        return {'password': Users.query.filter_by(email=data['email']).first().password,
+                                'user': Users.query.filter_by(email=data['email']).first().login}
                     else:
                         return 'BAD'
                 else:
@@ -112,11 +139,14 @@ def accounts():
             with app.app_context():
                 if Users.query.filter_by(email=data['email']).first():
                     if Users.query.filter_by(email=data['email']).first().password == data['password']:
-                        return {'password':Users.query.filter_by(email=data['email']).first().password, 'user' : Users.query.filter_by(email=data['email']).first().login}
+                        return {'password': Users.query.filter_by(email=data['email']).first().password,
+                                'user': Users.query.filter_by(email=data['email']).first().login}
                     else:
                         return 'BAD'
                 else:
                     return 'BAD'
+
+
 @app.route('/accounts/confirm/<email>', methods=['GET'])
 def confirm(email):
     data = tmp_users[email]
@@ -127,6 +157,7 @@ def confirm(email):
         db.session.add(user)
         db.session.commit()
     return redirect('/accounts/signin')
+
 
 @app.route('/accounts/signin', methods=['GET'])
 def signin():
@@ -141,6 +172,7 @@ def signup():
 @app.route("/checkout/<id>")
 def checkout(id):
     return render_template('checkout.html', product=Chamomile.query.get(int(id)))
+
 
 
 if __name__ == "__main__":

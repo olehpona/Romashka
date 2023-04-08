@@ -9,7 +9,7 @@
     <script src="{{  url_for('static' , filename='script.js') }}"></script>
 
 </head>
-<body>
+<body onload="preparePage()">
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -56,7 +56,7 @@
                   <h5 style="margin-bottom: 2vh;">Ціна:  <span style="margin-left: 5vh;"> {{ product.price }} Грн</span></h5>
                   <h5 style="margin-bottom: 2vh;">Опис: <span style="margin-left: 5vh;">{{ product.description }}</span></h5>
                   <label for="count" class="form-label" style="margin-right:5vh;"><h6>Кількість</h6></label>
-                  <input id="count" type="number" value="1">
+                  <input id="count" type="number" onchange="changeCount()" value="1" min="1">
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@
               <div class="accordion-body">
                 <ul class="list-group">
                   <li class="list-group-item">
-                    <select class="form-select" id="PostService" aria-label="Default select example" onclick="changePostService(this)">
+                    <select class="form-select" id="PostService" aria-label="Default select example" onclick="changePostService(this);changeService()">
                     <option selected>Доставка</option>
                     <option value="1">Нова Пошта</option>
                     <option value="2">Укр Пошта</option>
@@ -79,10 +79,10 @@
                 </li>
                 <div id="NewPost" style="display: none;">
                   <li class="list-group-item">
-                    <input type="text" id="City" onchange="getPoint(this.value)" class="form-control" placeholder="Місто Картоплі" >
+                    <input type="text" id="City" onchange="getPoint(this.value); changeCity()" class="form-control" placeholder="Місто Картоплі" >
                   </li>
                   <li class="list-group-item">
-                    <select id="point" class="form-select">
+                    <select id="point" onclick="changePoint()" class="form-select">
                     </select>
                   </li>
                 </div>
@@ -104,12 +104,8 @@
               <div class="accordion-body">
                 <ul class="list-group">
                   <li class="list-group-item">
-                    <input type="text" id="client" placeholder="ПІБ платника" class="form-control">
-                  </li>
-                  <li class="list-group-item">
                     <select class="form-select" id="payMethod">
-                      <option>Portmone</option>
-                      <option>Mono</option>
+                      <option>Stripe</option>
                       <option>При отримані</option>
                     </select>
                   </li>
@@ -125,7 +121,7 @@
             <div class="card-body">
               <h5 class="card-title">Card title</h5>
               <h6>Сервіс доставки: <span id="postServiceD"></span></h6>
-              <h6>Місто доставки: <span id="postCitiD"></span></h6>
+              <h6>Місто доставки: <span id="postCityD"></span></h6>
               <h6>Пункт видачі доставки: <span id="postPointD"></span></h6>
             </div>
             <div class="card-header">Усього</div>
@@ -133,9 +129,8 @@
               <h6>Товар: <span id="productD">{{ product.name }}</span></h6>
               <h6>Кількість: <span id="countD"></span></h6>
               <h6>Сума: <span id="sumD"></span></h6>
-              <h6>ПІД: <span id="clientD"></span></h6>
             </div>
-            <button type="button" class="btn btn-outline-success" onclick="GetPay('{{ product.price }}' ,'{{  url_for('static' , filename='mono.jpg') }}','{{ product.name }}')" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button type="button" class="btn btn-outline-success" onclick="GetPay('{{ product.id }}' ,'{{  url_for('static' , filename='mono.jpg') }}','{{ product.name }}')">
               Купити
             </button> 
           </div>
@@ -157,7 +152,7 @@
             </div>
           </div>
         </div>
-
+    <iframe style="width: 50vh; height: 50vh; display: none;" id="video" src="" frameborder="0" allowfullscreen></iframe>
     </main>
 
   <form action="https://www.portmone.com.ua/gateway/" id="payform" method="post" target="Pay">
@@ -167,8 +162,8 @@
 <form>
   <input type="hidden" id="price" value="{{ product.price }}">
 </form>
-<iframe class="container" src=""></iframe>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 </body>
 </html>

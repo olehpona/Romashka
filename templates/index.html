@@ -46,6 +46,11 @@
 </nav>
 
 <main class="container">
+    {%for type, message in get_flashed_messages(True) %}
+        <div class="alert alert {{type}}" id="alert" role="alert">
+            {{message}}
+        </div>
+    {% endfor %}
     <div id="carouselExample" class="carousel slide">
         <div class="carousel-inner"  style="border-radius: 15px; margin-top: 2vh;">
         <div class="carousel-item active">

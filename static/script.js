@@ -1,4 +1,4 @@
-function GetPay(price, pic, name) {
+async function GetPay(id, pic, name) {
     // Clear the payment information.
     const paymentElement = document.getElementById('Pay');
     paymentElement.innerHTML = '';
@@ -68,18 +68,28 @@ function GetPay(price, pic, name) {
             'bcMain': '',
         },
     };
-
-    // Take action based on the selected payment method.
-    if (paymentType === 'Portmone') {
-        // Submit the payment form for Portmone.
-        document.getElementById('paydata').value = JSON.stringify(paymentData);
-        document.getElementById('payform').submit();
-    } else if (paymentType === 'Mono') {
-        // Display the Mono payment image.
-        paymentElement.src = pic;
+    const data ={
+        id : id,
+        count : document.getElementById('count').value.toString()
+    }
+    if (getCookie('user') !== '' && sessionStorage.getItem('isLogged')) {    // Take action based on the selected payment method.
+        if (paymentType === 'Stripe') {
+            // Submit the payment form for Portmone.
+            response = await fetch('/api/pay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            window.location.replace(await response.text())
+        } else {
+            // Display that the payment has been made.
+            document.getElementById('video').style.display = 'block';
+            document.getElementById('video').src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
+        }
     } else {
-        // Display that the payment has been made.
-        paymentElement.src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
+        window.location.replace(window.location.origin + '/accounts/signin')
     }
 }
 
@@ -118,39 +128,50 @@ async function getPostOffices(cityName) {
     }
 }
 
-function changeAllInAll() {
-    let service = document.getElementById('PostService').selectedOptions[0].innerHTML;
-    if (service) {
-        document.getElementById('postServiceD').innerHTML = service;
-    }
-
-    let city = document.getElementById('City').value;
-    if (city) {
-        document.getElementById('postCityD').innerHTML = city;
-    }
-
-    let point = document.getElementById('point').selectedOptions[0].innerHTML;
-    if (point) {
-        document.getElementById('postPoinD').innerHTML = point;
-    }
-
-    let count = document.getElementById('count').value;
-    if (count) {
-        document.getElementById('countD').innerHTML = count;
-    }
-
-    let price = Number(document.getElementById('price').value);
-    if (price) {
-        let sum = price * count;
-        document.getElementById('sumD').innerHTML = sum;
-    }
-
+function changeClient() {
     let client = document.getElementById('client').value;
     if (client) {
         document.getElementById('clientD').innerHTML = client;
     }
 }
 
+function changePrice() {
+    let price = Number(document.getElementById('price').value);
+    let count = document.getElementById('count').value;
+    if (price && count) {
+        let sum = price * count;
+        document.getElementById('sumD').innerHTML = sum;
+    }
+}
+
+function changeCount() {
+    let count = document.getElementById('count').value;
+    if (count) {
+        document.getElementById('countD').innerHTML = count;
+    }
+    changePrice()
+}
+
+function changePoint() {
+    let point = document.getElementById('point').selectedOptions[0].innerHTML;
+    if (point) {
+        document.getElementById('postPointD').innerHTML = point;
+    }
+}
+
+function changeCity() {
+    let city = document.getElementById('City').value;
+    if (city) {
+        document.getElementById('postCityD').innerHTML = city;
+    }
+}
+
+function changeService() {
+    let service = document.getElementById('PostService').selectedOptions[0].innerHTML;
+    if (service) {
+        document.getElementById('postServiceD').innerHTML = service;
+    }
+}
 
 function sendReview(id) {
     const data = {
@@ -170,8 +191,9 @@ function sendReview(id) {
         });
 }
 
+
 async function postReview(data) {
-    const response = await fetch(`/review/${data.id}`, {
+    const response = await fetch(`/api/review/${data.id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -242,7 +264,7 @@ async function signup() {
                 'password': pass1
             }
         }
-        const response = await fetch(`/accounts`, {
+        const response = await fetch(`/api/accounts`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -299,7 +321,7 @@ async function signin() {
     const email = document.getElementById('inputEmail').value;
     const password = document.getElementById('inputPassword').value;
     setCookie('email', email, 20);
-    await checkUser('login' , password);
+    await checkUser('login', password);
 }
 
 function preparePage() {
@@ -309,7 +331,7 @@ function preparePage() {
         document.getElementById('uname').innerHTML = getCookie('user');
     } else {
         const returned = checkUser('check')
-        console.log( returned)
+        console.log(returned)
         if (returned === "OK") {
             document.getElementById('login_btn').style.display = 'none';
             document.getElementById('login_user').style.display = 'flex'
@@ -321,13 +343,13 @@ function preparePage() {
     }
 }
 
-async function checkUser(mode , pass) {
+async function checkUser(mode, pass) {
     const email = await getCookie('email');
     const alert = document.getElementById('alertjs')
-    let password ='';
-    if (mode === 'login'){
+    let password = '';
+    if (mode === 'login') {
         password = pass;
-    } else{
+    } else {
         password = await getCookie('password');
     }
     if (email !== '' && password !== '') {
@@ -338,7 +360,7 @@ async function checkUser(mode , pass) {
                 'password': password
             }
         }
-        const response = await fetch(`/accounts`, {
+        const response = await fetch(`/api/accounts`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -358,14 +380,21 @@ async function checkUser(mode , pass) {
                 sessionStorage.removeItem("isLogged");
                 return "BAD"
             } else {
-                if (document.getElementById('rememberMe').checked) {
-                    setCookie('email', email, 20);
-                    setCookie('user', text['user'], 20);
-                    setCookie('password', text['password'], 20);
+                remember = document.getElementById('rememberMe')
+                if (remember) {
+                    if (document.getElementById('rememberMe').checked) {
+                        setCookie('email', email, 20);
+                        setCookie('user', text['user'], 20);
+                        setCookie('password', text['password'], 20);
+                    }
+                    sessionStorage.setItem("isLogged", 'true');
+                    window.location.replace(window.location.origin)
+                    return "OK"
+                }   else {
+                    sessionStorage.setItem("isLogged", 'true');
+                    window.location.replace(window.location.origin)
+                    return "OK"
                 }
-                sessionStorage.setItem("isLogged", 'true');
-                window.location.replace(window.location.origin)
-                return "OK"
             }
         }
     } else {
