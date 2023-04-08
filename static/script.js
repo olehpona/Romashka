@@ -75,7 +75,7 @@ async function GetPay(id, pic, name) {
     if (getCookie('user') !== '' && sessionStorage.getItem('isLogged')) {    // Take action based on the selected payment method.
         if (paymentType === 'Stripe') {
             // Submit the payment form for Portmone.
-            response = await fetch('/api/pay', {
+            var response = await fetch('/api/pay', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -93,6 +93,33 @@ async function GetPay(id, pic, name) {
     }
 }
 
+function createTest(img , name , price){
+    var data = {
+        img : img,
+        name : name,
+        price: price
+    }
+    sessionStorage.setItem('Basket' , JSON.stringify([data]))
+}
+
+function prepareBasket(){
+    var product_list = JSON.parse(sessionStorage.getItem("Basket"));
+    var basket =document.getElementById('bk_body')
+    if (product_list) {
+        basket.innerHTML = '';
+        product_list.forEach((ob) => {
+            let child = `
+<div style="display: flex; height: 20vh; max-width: 100%; padding: 10px; align-items: center;">
+    <img src="${ob['img']}" style="border-radius: 25px;margin: 10px;">
+    <p style="margin: 10px;">${ob['name']}</p>
+    <p style="margin: 15px;">${ob['price']} грн</p>
+    <input type="number" style="max-width: 25%; margin: 10px; height:15%;">
+</div>
+            `;
+            basket.innerHTML += child;
+        })
+    }
+}
 
 async function getPostOffices(cityName) {
     try {

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link href="{{  url_for('static' , filename='styles.css') }}" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js"></script>
     <script src="{{  url_for('static' , filename='script.js') }}"></script>
@@ -11,159 +12,175 @@
 </head>
 <body onload="preparePage()">
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
+    <div class="container-fluid">
         <a class="navbar-brand" href="/">
-      <img src="{{ url_for('static' , filename='logo.png') }}" alt="Logo" class="d-inline-block align-text-top" width="120" height="50">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Головна</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Доставка</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link">Про нас</a>
-            </li>
-          </ul>
-        <div id="login_btn" class="nav-login">
-            <a type="button" href="/accounts/signin" class="btn btn-outline-success">Увійти</a>
-            <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
-        </div>
-        <div id="login_user" class="nav-login" style="display:none">
-            <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" width="50" height="50">
-            <a class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
+            <img src="{{ url_for('static' , filename='logo.png') }}" alt="Logo" class="d-inline-block align-text-top"
+                 width="120" height="50">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Головна</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Доставка</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">Про нас</a>
+                </li>
+            </ul>
+            <div id="login_btn" class="nav-login">
+                <a type="button" href="/accounts/signin" class="btn btn-outline-success">Увійти</a>
+                <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
+            </div>
+            <div id="login_user" class="nav-login" style="display:none">
+                <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" width="50"
+                     height="50">
+                <a class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
+            </div>
         </div>
     </div>
-  </div>
 </nav>
-  <main class="container" style="display: flex;" onclick="changeAllInAll()">
+<main class="container" style="display: flex;" onclick="changeAllInAll()">
     <div class="accordion" id="accordionExample" style=" margin-top: 2vh; width: 80vh;">
-          <div class="accordion-item">
+        <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Товар
-              </button>
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                        aria-expanded="true" aria-controls="collapseOne">
+                    Товар
+                </button>
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <div>
-                  <h5 style="margin-bottom: 2vh;">Товар: <span style="margin-left: 5vh;">{{ product.name }}</span></h5>
-                  <h5 style="margin-bottom: 2vh;">Ціна:  <span style="margin-left: 5vh;"> {{ product.price }} Грн</span></h5>
-                  <h5 style="margin-bottom: 2vh;">Опис: <span style="margin-left: 5vh;">{{ product.description }}</span></h5>
-                  <label for="count" class="form-label" style="margin-right:5vh;"><h6>Кількість</h6></label>
-                  <input id="count" type="number" onchange="changeCount()" value="1" min="1">
+                <div class="accordion-body">
+                    <div>
+                        <h5 style="margin-bottom: 2vh;">Товар: <span style="margin-left: 5vh;">{{ product.name }}</span>
+                        </h5>
+                        <h5 style="margin-bottom: 2vh;">Ціна: <span
+                                style="margin-left: 5vh;"> {{ product.price }} Грн</span></h5>
+                        <h5 style="margin-bottom: 2vh;">Опис: <span
+                                style="margin-left: 5vh;">{{ product.description }}</span></h5>
+                        <label for="count" class="form-label" style="margin-right:5vh;"><h6>Кількість</h6></label>
+                        <input id="count" type="number" onchange="changeCount()" value="1" min="1">
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="accordion-item">
+        </div>
+        <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Доставка
-              </button>
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Доставка
+                </button>
             </h2>
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <ul class="list-group">
-                  <li class="list-group-item">
-                    <select class="form-select" id="PostService" aria-label="Default select example" onclick="changePostService(this);changeService()">
-                    <option selected>Доставка</option>
-                    <option value="1">Нова Пошта</option>
-                    <option value="2">Укр Пошта</option>
-                  </select>
-                </li>
-                <div id="NewPost" style="display: none;">
-                  <li class="list-group-item">
-                    <input type="text" id="City" onchange="getPoint(this.value); changeCity()" class="form-control" placeholder="Місто Картоплі" >
-                  </li>
-                  <li class="list-group-item">
-                    <select id="point" onclick="changePoint()" class="form-select">
-                    </select>
-                  </li>
-                </div>
-                <div id="UkrPost" style="display: none;">
-                  <p>Я не виграв битви з API Укр Пошти</p>
-                </div>
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <select class="form-select" id="PostService" aria-label="Default select example"
+                                    onclick="changePostService(this);changeService()">
+                                <option selected>Доставка</option>
+                                <option value="1">Нова Пошта</option>
+                                <option value="2">Укр Пошта</option>
+                            </select>
+                        </li>
+                        <div id="NewPost" style="display: none;">
+                            <li class="list-group-item">
+                                <input type="text" id="City" onchange="getPoint(this.value); changeCity()"
+                                       class="form-control" placeholder="Місто Картоплі">
+                            </li>
+                            <li class="list-group-item">
+                                <select id="point" onclick="changePoint()" class="form-select">
+                                </select>
+                            </li>
+                        </div>
+                        <div id="UkrPost" style="display: none;">
+                            <p>Я не виграв битви з API Укр Пошти</p>
+                        </div>
 
-                </ul>
-              </div>
+                    </ul>
+                </div>
             </div>
-          </div>
-          <div class="accordion-item" >
+        </div>
+        <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button"  data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                Оплата
-              </button>
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Оплата
+                </button>
             </h2>
             <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <ul class="list-group">
-                  <li class="list-group-item">
-                    <select class="form-select" id="payMethod">
-                      <option>Stripe</option>
-                      <option>При отримані</option>
-                    </select>
-                  </li>
-                </ul>
-              </div>
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <select class="form-select" id="payMethod">
+                                <option>Stripe</option>
+                                <option>При отримані</option>
+                            </select>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="card" style="width: 18rem; margin: 2vh;">
-          <div class="card-body">
+    </div>
+    <div class="card" style="width: 18rem; margin: 2vh;">
+        <div class="card-body">
             <h5 class="card-title">Загальна інформація</h5>
             <div class="card-header">Доставка</div>
             <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <h6>Сервіс доставки: <span id="postServiceD"></span></h6>
-              <h6>Місто доставки: <span id="postCityD"></span></h6>
-              <h6>Пункт видачі доставки: <span id="postPointD"></span></h6>
+                <h5 class="card-title">Card title</h5>
+                <h6>Сервіс доставки: <span id="postServiceD"></span></h6>
+                <h6>Місто доставки: <span id="postCityD"></span></h6>
+                <h6>Пункт видачі доставки: <span id="postPointD"></span></h6>
             </div>
             <div class="card-header">Усього</div>
             <div class="card-body">
-              <h6>Товар: <span id="productD">{{ product.name }}</span></h6>
-              <h6>Кількість: <span id="countD"></span></h6>
-              <h6>Сума: <span id="sumD"></span></h6>
+                <h6>Товар: <span id="productD">{{ product.name }}</span></h6>
+                <h6>Кількість: <span id="countD"></span></h6>
+                <h6>Сума: <span id="sumD"></span></h6>
             </div>
-            <button type="button" class="btn btn-outline-success" onclick="GetPay('{{ product.id }}' ,'{{  url_for('static' , filename='mono.jpg') }}','{{ product.name }}')">
-              Купити
-            </button> 
-          </div>
+            <button type="button" class="btn btn-outline-success"
+                    onclick="GetPay('{{ product.id }}' ,'{{  url_for('static' , filename='mono.jpg') }}','{{ product.name }}')">
+                Купити
+            </button>
         </div>
+    </div>
 
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="Portmone" aria-hidden="true" style="height: 90vh;">
-          <div class="modal-dialog" style="height: 60%;">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="Portmone" aria-hidden="true"
+         style="height: 90vh;">
+        <div class="modal-dialog" style="height: 60%;">
             <div class="modal-content" style="height: 100%;">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Оплата</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body" style="height: 100%;">
-                <iframe name="Pay" id="Pay" width="100%" height="100%"  frameborder="0" ></iframe>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
-              </div>
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Оплата</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 100%;">
+                    <iframe name="Pay" id="Pay" width="100%" height="100%" frameborder="0"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                </div>
             </div>
-          </div>
         </div>
-    <iframe style="width: 50vh; height: 50vh; display: none;" id="video" src="" frameborder="0" allowfullscreen></iframe>
-    </main>
+    </div>
+    <iframe style="width: 50vh; height: 50vh; display: none;" id="video" src="" frameborder="0"
+            allowfullscreen></iframe>
+</main>
 
-  <form action="https://www.portmone.com.ua/gateway/" id="payform" method="post" target="Pay">
-    <input type="hidden" name="bodyRequest" id="paydata" value='' />
-    <input type="hidden" name="typeRequest" value='json' />
-  </form>
+<form action="https://www.portmone.com.ua/gateway/" id="payform" method="post" target="Pay">
+    <input type="hidden" name="bodyRequest" id="paydata" value=''/>
+    <input type="hidden" name="typeRequest" value='json'/>
+</form>
 <form>
-  <input type="hidden" id="price" value="{{ product.price }}">
+    <input type="hidden" id="price" value="{{ product.price }}">
 </form>
 
 
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
 </body>
 </html>

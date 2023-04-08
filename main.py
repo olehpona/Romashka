@@ -12,10 +12,15 @@ context = ssl.SSLContext(ssl.PROTOCOL_TLS)
 context.load_cert_chain('security/cert.pem', keyfile='security/key.pem', password='aboba')
 
 tmp_users = {}
+email = email_management.Mail()
+email.email_addr = 'flowerfactory@ukr.net'
+email.email_pass = "uipSo7xmCozBbXdj"
+
+processed_pay = {}
 
 db = SQLAlchemy()
 
-app = Flask(__name__,)  # Створюємо веб–додаток Flask
+app = Flask(__name__, )  # Створюємо веб–додаток Flask
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -23,7 +28,7 @@ app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 
 
-#models
+# models
 class Chamomile(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -31,9 +36,7 @@ class Chamomile(db.Model):
     description = db.Column(db.Text)
     type = db.Column(db.String, nullable=False)
     pic_url = db.Column(db.String)
-    stripe_price = db.Column(db.String , nullable=False)
-
-
+    stripe_price = db.Column(db.String, nullable=False)
 
 
 class Review(db.Model):
@@ -51,7 +54,8 @@ class Users(db.Model):
     tel = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
 
-#routes
+
+# routes
 @app.route("/")  # Вказуємо url-адресу для виклику функції
 def index():
     with app.app_context():
@@ -92,15 +96,31 @@ def create_pay_session():
         custom_text={
             "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
         },
-        success_url='https://127.0.0.1:5000/',
+        success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=f'https://127.0.0.1:5000/checkout/{data["id"]}'
     )
     print(checkout_session.url)
     return checkout_session.url
 
 
-@app.route('/api/pay/success')
+@app.route('/api/pay/success', methods=['GET'])
 def pay_success():
+    print(request.args.to_dict())
+    session = stripe.checkout.Session.retrieve(request.args.get('session_id'))
+    print(session)
+    processed_pay[session['id']] = session
+    list_product = stripe.checkout.Session.list_line_items(request.args.get('session_id'))
+    products = []
+    for i in list_product:
+        _ = Chamomile.query.filter_by(stripe_price=i['price']['id']).first()
+        data = {
+            'price': _.price,
+            'name': _.name,
+            'quantity': i['quantity'],
+            'pic_url': _.pic_url
+        }
+        products.append(data)
+    email.send_buy_mail(session['customer_details']["email"], products)
     flash('Транс-акція пройшла успаішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
           'alert-success')
     return redirect('/')
@@ -119,7 +139,7 @@ def accounts():
                 return 'BAD'
             else:
                 tmp_users[data['email']] = data
-                email_management.send_mail(data['email'])
+                email.send_confirm_mail(data['email'])
                 print(tmp_users)
                 return 'OK'
         elif geted['type'] == 'login':
@@ -172,7 +192,6 @@ def signup():
 @app.route("/checkout/<id>")
 def checkout(id):
     return render_template('checkout.html', product=Chamomile.query.get(int(id)))
-
 
 
 if __name__ == "__main__":
