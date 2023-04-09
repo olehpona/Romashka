@@ -1,80 +1,25 @@
 async function GetPay(id, pic, name) {
     // Clear the payment information.
-    const paymentElement = document.getElementById('Pay');
-    paymentElement.innerHTML = '';
+
 
     // Determine the selected payment method.
-    const paymentType = document.getElementById('payMethod').selectedOptions[0].innerHTML;
+    var paymentTypeob = document.getElementById('payMethod');
+    if (paymentTypeob) {
+        var paymentType = paymentTypeob.selectedOptions[0].innerHTML;
+    } else {
+        var paymentType = 'null'
+    }
 
     // Build the payment data object.
-    const paymentData = {
-        'paymentTypes': {
-            'gpay': 'Y',
-            'card': 'Y',
-            'portmone': 'Y',
-            'token': 'N',
-            'clicktopay': 'Y',
-            'createtokenonly': 'N',
-        },
-        'priorityPaymentTypes': {
-            'gpay': '3',
-            'card': '3',
-            'portmone': '1',
-            'token': '0',
-            'clicktopay': '0',
-            'createtokenonly': '0',
-        },
-        'payee': {
-            'payeeId': '3048',
-            'login': '',
-            'dt': '',
-            'signature': '',
-            'shopSiteId': '',
-        },
-        'order': {
-            'description': `Ромашка ${name}`,
-            'shopOrderNumber': 'SHP-00445401',
-            'billAmount': (Number(price) * Number(document.getElementById('count').value)).toString(),
-            'attribute1': '1',
-            'attribute2': '2',
-            'attribute3': '3',
-            'attribute4': '4',
-            'attribute5': '',
-            'successUrl': '',
-            'failureUrl': '',
-            'preauthFlag': 'N',
-            'billCurrency': 'UAH',
-            'encoding': '',
-        },
-        'token': {
-            'tokenFlag': 'N',
-            'returnToken': 'N',
-            'token': '',
-            'cardMask': '',
-            'otherPaymentMethods': 'Y',
-            'sellerToken': '',
-        },
-        'payer': {
-            'lang': 'uk',
-            'emailAddress': 'test@ukr.net',
-        },
-        'style': {
-            'type': 'light',
-            'logo': '',
-            'backgroundColorHeader': '',
-            'backgroundColorButtons': '',
-            'colorTextAndIcons': '',
-            'borderColorList': '',
-            'bcMain': '',
-        },
-    };
-    const data ={
-        id : id,
-        count : document.getElementById('count').value.toString()
-    }
+
+
     if (getCookie('user') !== '' && sessionStorage.getItem('isLogged')) {    // Take action based on the selected payment method.
         if (paymentType === 'Stripe') {
             // Submit the payment form for Portmone.
+            var data = {
+                id: id,
+                count: document.getElementById('count').value.toString()
+            }
             var response = await fetch('/api/pay', {
                 method: 'POST',
                 headers: {
@@ -85,35 +30,69 @@ async function GetPay(id, pic, name) {
             window.location.replace(await response.text())
         } else {
             // Display that the payment has been made.
-            document.getElementById('video').style.display = 'block';
-            document.getElementById('video').src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
+            var iframe = document.getElementById('video')
+            if (iframe) {
+                iframe.style.display = 'block';
+                iframe.src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
+            } else {
+                var data_list = []
+                let product_list = JSON.parse(await sessionStorage.getItem("Basket"))['basket'];
+                await product_list.forEach(ob => data_list.push(ob));
+                console.log(data_list)
+                var response = await fetch('/api/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: await JSON.stringify(data_list)
+                });
+                window.location.replace(await response.text())
+            }
         }
     } else {
         window.location.replace(window.location.origin + '/accounts/signin')
     }
 }
 
-function createTest(img , name , price){
+
+
+function createTest(img, name, price, id, count) {
     var data = {
-        img : img,
-        name : name,
-        price: price
+        img: img,
+        name: name,
+        price: price,
+        id: id,
+        count: count
     }
-    sessionStorage.setItem('Basket' , JSON.stringify([data]))
+    sessionStorage.setItem('Basket', JSON.stringify({'basket': [data , data]}))
 }
 
-function prepareBasket(){
-    var product_list = JSON.parse(sessionStorage.getItem("Basket"));
-    var basket =document.getElementById('bk_body')
+function remove_product_from_busket(el){
+    let changed = JSON.parse(sessionStorage.getItem("Basket"))['basket'].filter(function (ob){
+        console.log(typeof el.getAttribute('for-product'))
+            console.log(typeof ob['id'])
+        return ob['id'] !== Number(el.getAttribute('for-product'))
+    });
+    console.log(changed)
+    sessionStorage.setItem('Basket', JSON.stringify({'basket': changed}))
+    prepareBasket()
+}
+
+
+function prepareBasket() {
+    var basket = document.getElementById('bk_body')
+    basket.innerHTML = '';
+    var product_list = JSON.parse(sessionStorage.getItem("Basket"))['basket'];
+    console.log(product_list)
     if (product_list) {
-        basket.innerHTML = '';
         product_list.forEach((ob) => {
             let child = `
 <div style="display: flex; height: 20vh; max-width: 100%; padding: 10px; align-items: center;">
-    <img src="${ob['img']}" style="border-radius: 25px;margin: 10px;">
+    <img src="${ob['img']}" width="200" height="120" style="border-radius: 25px;margin: 10px;">
     <p style="margin: 10px;">${ob['name']}</p>
     <p style="margin: 15px;">${ob['price']} грн</p>
-    <input type="number" style="max-width: 25%; margin: 10px; height:15%;">
+    <input id="count${ob['id']}" type="number" style="max-width: 25%; margin: 10px; height:20%;" value="${ob['count']}">
+    <button type="button" class="btn-close" aria-label="Close" onclick="remove_product_from_busket(this)" for-product="${ob['id']}"></button>
 </div>
             `;
             basket.innerHTML += child;
@@ -417,7 +396,7 @@ async function checkUser(mode, pass) {
                     sessionStorage.setItem("isLogged", 'true');
                     window.location.replace(window.location.origin)
                     return "OK"
-                }   else {
+                } else {
                     sessionStorage.setItem("isLogged", 'true');
                     window.location.replace(window.location.origin)
                     return "OK"

@@ -84,20 +84,16 @@ def review(id):
 def create_pay_session():
     data = request.get_json()
     print(data)
+    items = [{'price': Chamomile.query.filter_by(id=i['id']).first().stripe_price, 'quantity': i['count']} for i in
+             data]
     checkout_session = stripe.checkout.Session.create(
-        line_items=[
-            {
-                # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                'price': Chamomile.query.filter_by(id=data['id']).first().stripe_price,
-                'quantity': data['count'],
-            },
-        ],
+        line_items=items,
         mode='payment',
         custom_text={
             "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
         },
         success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url=f'https://127.0.0.1:5000/checkout/{data["id"]}'
+        cancel_url=f'https://127.0.0.1:5000/'
     )
     print(checkout_session.url)
     return checkout_session.url
