@@ -59,7 +59,7 @@ class Mail():
         password = self.email_pass
 
         message = MIMEMultipart('alternative')
-        message["Subject"] = "Підтвердження Email"
+        message["Subject"] = "Покупка"
         message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
         message["To"] = receiver_email
         text = f"""\

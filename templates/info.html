@@ -38,12 +38,31 @@
             <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
         </div>
         <div id="login_user" class="nav-login" style="display:none">
+            <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" onclick="prepareBasket()" style="margin-right: 15px;" aria-controls="offcanvasExample">
+                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081822.png" width="50" height="50">
+            </a>
             <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" width="50" height="50">
             <a class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
         </div>
     </div>
   </div>
 </nav>
+
+<div class="offcanvas offcanvas-end" style="width: 35%;" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Кошик</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div  id="of_body" class="offcanvas-body">
+      <div id="bk_body">
+      </div>
+      <div id="bk_btn">
+          <button type="button" onclick="GetPay()" class="btn btn-outline-success">Оплатити</button>
+          <button type="button" aria-controls="offcanvasExample" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" onclick="document.getElementById('bk_body').innerHTML = '';sessionStorage.setItem('Basket', JSON.stringify({'basket': []}))" class="btn btn-outline-danger">Очистити</button>
+
+      </div>
+  </div>
+</div>
 
 <main class="container">
   <div style="display: flex;">
@@ -74,7 +93,7 @@
         <div class="card-body">
           <h5 class="card-title">{{ product.name }}</h5>
           <p class="card-text">{{ product.description }}</p>
-          <a href="/checkout/{{ product.id }}" class="btn btn-outline-success">Купити {{ product.price }}</a>
+          <button aria-controls="offcanvasExample" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"  onclick="addProductToBasket({{ product.id }})" class="btn btn-outline-success">Додати в кошик {{ product.price }}</button>
             
         </div>
       </div>

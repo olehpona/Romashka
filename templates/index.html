@@ -53,11 +53,12 @@
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">Кошик</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-  <div  class="offcanvas-body">
+  <div  id="of_body" class="offcanvas-body">
       <div id="bk_body">
       </div>
-      <div>
+      <div id="bk_btn">
           <button type="button" onclick="GetPay()" class="btn btn-outline-success">Оплатити</button>
+          <button type="button" onclick="document.getElementById('bk_body').innerHTML = '';sessionStorage.setItem('Basket', JSON.stringify({'basket': []}))" class="btn btn-outline-danger">Очистити</button>
       </div>
   </div>
 </div>

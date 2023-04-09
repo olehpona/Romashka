@@ -55,22 +55,21 @@ async function GetPay(id, pic, name) {
 }
 
 
-
-function createTest(img, name, price, id, count) {
+function createTest(img, product, price, id, count) {
     var data = {
         img: img,
-        name: name,
+        name: product,
         price: price,
         id: id,
         count: count
     }
-    sessionStorage.setItem('Basket', JSON.stringify({'basket': [data , data]}))
+    sessionStorage.setItem('Basket', JSON.stringify({'basket': [data, data]}))
 }
 
-function remove_product_from_busket(el){
-    let changed = JSON.parse(sessionStorage.getItem("Basket"))['basket'].filter(function (ob){
+function remove_product_from_busket(el) {
+    let changed = JSON.parse(sessionStorage.getItem("Basket"))['basket'].filter(function (ob) {
         console.log(typeof el.getAttribute('for-product'))
-            console.log(typeof ob['id'])
+        console.log(typeof ob['id'])
         return ob['id'] !== Number(el.getAttribute('for-product'))
     });
     console.log(changed)
@@ -84,21 +83,86 @@ function prepareBasket() {
     basket.innerHTML = '';
     var product_list = JSON.parse(sessionStorage.getItem("Basket"))['basket'];
     console.log(product_list)
-    if (product_list) {
+    if (product_list != 0) {
         product_list.forEach((ob) => {
             let child = `
 <div style="display: flex; height: 20vh; max-width: 100%; padding: 10px; align-items: center;">
     <img src="${ob['img']}" width="200" height="120" style="border-radius: 25px;margin: 10px;">
     <p style="margin: 10px;">${ob['name']}</p>
     <p style="margin: 15px;">${ob['price']} грн</p>
-    <input id="count${ob['id']}" type="number" style="max-width: 25%; margin: 10px; height:20%;" value="${ob['count']}">
+    <input id="count${ob['id']}" for-product="${ob['id']}" onchange="setCount(this)" type="number" style="max-width: 25%; margin: 10px; height:20%;" value="${ob['count']}">
     <button type="button" class="btn-close" aria-label="Close" onclick="remove_product_from_busket(this)" for-product="${ob['id']}"></button>
 </div>
             `;
             basket.innerHTML += child;
         })
+        document.getElementById('bk_btn').style.display = 'flex'
+    }   else {
+        console.log('a')
+        document.getElementById('bk_body').innerHTML = `
+        <div class="alert alert-info" id="alert" role="alert">
+            Упс тут пусто!
+        </div>
+        `
+        document.getElementById('bk_btn').style.display = 'none'
     }
 }
+
+async function addProductToBasket(id) {
+    let products = JSON.parse(sessionStorage.getItem("Basket"))['basket'];
+    let find_index = products.findIndex((ob) =>
+        ob['id'] === id
+    )
+
+    if (find_index !== -1) {
+        products[find_index] = {
+            img: products[find_index]['img'],
+            name: products[find_index]['name'],
+            price: products[find_index]['price'],
+            id: products[find_index]['id'],
+            count: Number(products[find_index]['count']) + 1
+        }
+
+    } else {
+        const response = await fetch(`/api/product/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        let json = await response.json();
+        let data = {
+            img: json['img'],
+            name: json['name'],
+            price: json['price'],
+            id: json['id'],
+            count: 1
+        }
+        await products.push(data)
+        console.log(products)
+    }
+    sessionStorage.setItem('Basket', JSON.stringify({'basket': products}))
+    prepareBasket()
+}
+
+function setCount(el) {
+    let id = Number(el.getAttribute('for-product'))
+    let products = JSON.parse(sessionStorage.getItem('Basket'))['basket'];
+    let find_index = products.findIndex((ob) => ob['id'] === id)
+    console.log(id)
+    console.log(find_index)
+    products[find_index] = {
+        img: products[find_index]['img'],
+        name: products[find_index]['name'],
+        price: products[find_index]['price'],
+        id: products[find_index]['id'],
+        count: Number(el.value)
+    }
+    console.log(products)
+    sessionStorage.setItem('Basket', JSON.stringify({'basket': products}))
+    prepareBasket()
+}
+
 
 async function getPostOffices(cityName) {
     try {
