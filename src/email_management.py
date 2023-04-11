@@ -57,7 +57,9 @@ class Mail():
         sender_email = self.email_addr
         receiver_email = email
         password = self.email_pass
-
+        sum = 0
+        for i in products:
+            sum +=int(i['price']) * int(i['quantity'])
         message = MIMEMultipart('alternative')
         message["Subject"] = "Покупка"
         message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
@@ -78,14 +80,15 @@ class Mail():
             """
         for i in products:
             html += f'''
-            <div style="display:flex; padding: 15px;">
+            <div style="display:flex; padding: 15px; flex-wrap: nowrap;">
             <img style="width:10vh ; height: 10vh; border-radius:25px;" src="{i['pic_url']}">
-            <p style="margin:15px;">{i['name']}.</p>
-            <p style="margin:15px;">Ціна {i['price']}.</p>
-            <p style="margin:15px;">Кількість {i['quantity']}.</p>
+            <p style="margin:15px;">{i['name']}</p>
+            <p style="margin:15px;">Ціна: {i['price']} грн</p>
+            <p style="margin:15px;">Кількість: {i['quantity']}</p>
             </div>
             '''
-        html += '''
+        html += f'''
+                <p>Сума: {sum} грн</p>
                 <p>Виникли труднощі звертайся!</p>
             </div>
         </main>

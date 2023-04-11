@@ -1,77 +1,38 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Створити акаунт - Магазин</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="{{  url_for('static' , filename='script.js') }}"></script>
-</head>
-<body>
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-      <img src="{{ url_for('static' , filename='logo.png') }}" alt="Logo" class="d-inline-block align-text-top" width="120" height="50">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Головна</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Доставка</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link">Про нас</a>
-            </li>
-          </ul>
-        <div id="login_btn" class="nav-login">
-            <a type="button" href="/accounts/signin" class="btn btn-outline-success">Увійти</a>
-            <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
-        </div>
-        <div id="login_user" class="nav-login" style="display:none">
-            <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" width="50" height="50">
-            <a class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
-        </div>
+{% extends 'base.html' %}
+{% block title %}Головна{% endblock %}
+{% block content %}
+<form>
+    <h3 class="mb-3">Створення акаунту</h3>
+    <div class="mb-3">
+        <label for="inputName" class="form-label">Ім'я</label>
+        <input type="text" class="form-control" id="inputName" placeholder="Введіть ім'я">
     </div>
-  </div>
-</nav>
-    <main class="container" style="margin-top: 2rem;">
-        <form>
-            <h3 class="mb-3">Створення акаунту</h3>
-            <div class="mb-3">
-                <label for="inputName" class="form-label">Ім'я</label>
-                <input type="text" class="form-control" id="inputName" placeholder="Введіть ім'я">
-            </div>
-            <div class="mb-3">
-                <label for="inputEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" id="inputEmail" placeholder="Введіть email">
-            </div>
-            <div class="mb-3">
-                <label for="inputPhone" class="form-label">Телефон</label>
-                <input type="tel" class="form-control" id="inputPhone" placeholder="Введіть номер телефону">
-            </div>
-            <div class="mb-3">
-                <label for="inputPassword" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="inputPassword" placeholder="Введіть пароль">
-            </div>
-            <div class="mb-3">
-                <label for="confirmPassword" class="form-label">Підтвердження пароля</label>
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Підтвердьте пароль">
-            </div>
-            <div class="alert alert-danger" id="alertjs" role="alert" style="display:none">
+    <div class="mb-3">
+        <label for="inputEmail" class="form-label">Email</label>
+        <input type="email" class="form-control" id="inputEmail" placeholder="Введіть email">
+    </div>
+    <div class="mb-3">
+        <label for="inputPhone" class="form-label">Телефон</label>
+        <input type="tel" class="form-control" id="inputPhone" placeholder="Введіть номер телефону">
+    </div>
+    <div class="mb-3">
+        <label for="inputPassword" class="form-label">Пароль</label>
+        <input type="password" class="form-control" id="inputPassword" placeholder="Введіть пароль">
+    </div>
+    <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Підтвердження пароля</label>
+        <input type="password" class="form-control" id="confirmPassword" placeholder="Підтвердьте пароль">
+    </div>
+    <div class="alert alert-danger" id="alertjs" role="alert" style="display:none">
 
-            </div>
-            {%for type, message in get_flashed_messages(True) %}
-                <div class="alert alert {{type}}" id="alert" role="alert">
-                    {{message}}
-                </div>
-            {% endfor %}
-            <button type="button" onclick="signup()" class="btn btn-outline-success">Зареєструватися</button>
-        </form>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-SrZe1T2T9jCVT31s0KnLlRREbhvwHrz+DwJuKgE3qONzDZ+T9TtjwuZQJrwFUIBd" crossorigin="anonymous"></script>
-</body>
-</html>
+    </div>
+    {%for type, message in get_flashed_messages(True) %}
+    <div class="alert alert {{type}}" id="alert" role="alert">
+        {{message}}
+    </div>
+    {% endfor %}
+    <button type="button" onclick="signup()" class="btn btn-outline-success">Зареєструватися</button>
+</form>
+{% endblock %}
+
+

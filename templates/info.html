@@ -1,159 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Main</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link href="{{  url_for('static' , filename='styles.css') }}" rel="stylesheet">
-    <script src="{{  url_for('static' , filename='script.js') }}"></script>
-
-</head>
-<body onload="preparePage()">
-
-
-
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-      <img src="{{ url_for('static' , filename='logo.png') }}" alt="Logo" class="d-inline-block align-text-top" width="120" height="50">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Головна</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Доставка</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link">Про нас</a>
-            </li>
-          </ul>
-        <div id="login_btn" class="nav-login">
-            <a type="button" href="/accounts/signin" class="btn btn-outline-success">Увійти</a>
-            <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
-        </div>
-        <div id="login_user" class="nav-login" style="display:none">
-            <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" onclick="prepareBasket()" style="margin-right: 15px;" aria-controls="offcanvasExample">
-                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081822.png" width="50" height="50">
-            </a>
-            <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" width="50" height="50">
-            <a class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
-        </div>
-    </div>
-  </div>
-</nav>
-
-<div class="offcanvas offcanvas-end" style="width: 35%;" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Кошик</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div  id="of_body" class="offcanvas-body">
-      <div id="bk_body">
-      </div>
-      <div id="bk_btn">
-          <button type="button" onclick="GetPay()" class="btn btn-outline-success">Оплатити</button>
-          <button type="button" aria-controls="offcanvasExample" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" onclick="document.getElementById('bk_body').innerHTML = '';sessionStorage.setItem('Basket', JSON.stringify({'basket': []}))" class="btn btn-outline-danger">Очистити</button>
-
-      </div>
-  </div>
-</div>
-
-<main class="container">
-  <div style="display: flex;">
-      <div id="carouselExample" class="carousel slide">
-        <div class="carousel-inner"  style="border-radius: 15px; margin-top: 2vh; width: 100vh;">
-          <div class="carousel-item active">
-            <img src="https://greenheal.com.ua/files/uploads/romashka_lekarstvennaya.jpg" class="d-block" alt="1" style="height: 100%;min-height:200px;max-height: 400px; min-width: 100%;">
-          </div>
-          <div class="carousel-item">
-            <img src="https://www.harbuz.info/wp-content/uploads/2018/03/rom.jpg" class="d-block" alt="2" style="height: 100%; min-height:200px;max-height: 400px;min-width: 100%">
-          </div>
-          <div class="carousel-item">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chamomile%40original_size.jpg/800px-Chamomile%40original_size.jpg" class="d-block" alt="3" style="height: 100%;min-height:200px;max-height: 400px;min-width: 100%">
-          </div>
+{% extends 'base.html' %}
+{% block title %}Головна{% endblock %}
+{% block content %}
+<div style="display: flex;">
+    <div id="carouselExample" class="carousel slide">
+        <div class="carousel-inner" style="border-radius: 15px; margin-top: 2vh; width: 100vh;">
+            <div class="carousel-item active">
+                <img src="https://greenheal.com.ua/files/uploads/romashka_lekarstvennaya.jpg" class="d-block" alt="1"
+                     style="height: 100%;min-height:200px;max-height: 400px; min-width: 100%;">
+            </div>
+            <div class="carousel-item">
+                <img src="https://www.harbuz.info/wp-content/uploads/2018/03/rom.jpg" class="d-block" alt="2"
+                     style="height: 100%; min-height:200px;max-height: 400px;min-width: 100%">
+            </div>
+            <div class="carousel-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chamomile%40original_size.jpg/800px-Chamomile%40original_size.jpg"
+                     class="d-block" alt="3" style="height: 100%;min-height:200px;max-height: 400px;min-width: 100%">
+            </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
         </button>
-      </div>
+    </div>
     <div class="infocards" style="margin-top: 2vh; margin-left: 8vh;">
-      <div class="card" style="width: 18rem; margin-bottom: 2vh;">
-        <h5 class="card-header">Про товар</h5>
-        <div class="card-body">
-          <h5 class="card-title">{{ product.name }}</h5>
-          <p class="card-text">{{ product.description }}</p>
-          <button aria-controls="offcanvasExample" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"  onclick="addProductToBasket({{ product.id }})" class="btn btn-outline-success">Додати в кошик {{ product.price }}</button>
-            
+        <div class="card" style="width: 18rem; margin-bottom: 2vh;">
+            <h5 class="card-header">Про товар</h5>
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description }}</p>
+                <button onclick="addProductToBasket({{ product.id }})" aria-controls="offcanvasExample"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" class="btn btn-outline-success">
+                    Додати в кошик {{ product.price }}
+                </button>
+
+            </div>
         </div>
-      </div>
-      <div class="card" style="width: 18rem; margin-bottom: 2vh;">
-        <h5 class="card-header">Доставка</h5>
-        <div class="card-body">
-          <h5 class="card-title"><span>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9-FcIlDncsbL-jGju1qGBPt4i0_k3UXiw7k_XmsNlBA0uwkqCLMcfkkY_v9l8l4lngdA&usqp=CAU" style="height: 15%; width:15%;">
+        <div class="card" style="width: 18rem; margin-bottom: 2vh;">
+            <h5 class="card-header">Доставка</h5>
+            <div class="card-body">
+                <h5 class="card-title"><span>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9-FcIlDncsbL-jGju1qGBPt4i0_k3UXiw7k_XmsNlBA0uwkqCLMcfkkY_v9l8l4lngdA&usqp=CAU"
+                 style="height: 15%; width:15%;">
           </span>Нова пошта</h5>
-          <p class="card-text">Від 60 грн (+/- 3 дня)</p>
-        </div>
-        <div class="card-body">
-          <h5 class="card-title"><span>
+                <p class="card-text">Від 60 грн (+/- 3 дня)</p>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title"><span>
             <img src="https://www.ukrposhta.ua/doc/for-media/logo_pin_ukrpost.jpg" style="height: 10%; width:10%;">
           </span>Укр пошта</h5>
-          <p class="card-text">Від 30 грн (+/- 5 днів)</p>
+                <p class="card-text">Від 30 грн (+/- 5 днів)</p>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <div class="Rewiews" style="width: 80vh;">
+</div>
+<div class="Rewiews" style="width: 80vh;">
     <div class="createRewiews">
-      <form method="post">
-        <div class="mb-3">
-          <label for="Email" class="form-label">Email адрес</label>
-          <input type="email" class="form-control" id="Email">
-        </div>
-        <div class="mb-3">
-          <label for="Rate" class="form-label">Оцінка</label>
-          <input type="number" class="form-control" id="Rate" max="5" min="0">
-        </div>
-        <div class="mb-3">
-          <label for="detail" class="form-label">Відгук</label>
-          <textarea class="form-control" id="detail" rows="5"></textarea>
-        </div>        
-        <button type="button" onclick="sendReview('{{ product.id }}')" class="btn btn-primary">Надіслати</button>
-      </form>
+        <form method="post">
+
+            <div class="mb-3">
+                <label for="Rate" class="form-label">Оцінка</label>
+                <input type="number" class="form-control" id="Rate" max="5" min="0">
+            </div>
+            <div class="mb-3">
+                <label for="detail" class="form-label">Відгук</label>
+                <textarea class="form-control" id="detail" rows="5"></textarea>
+            </div>
+            <button type="button" onclick="sendReview('{{ product.id }}')" class="btn btn-primary">Надіслати</button>
+        </form>
     </div>
     <div class="rewiew list" style="display:inline-table;">
-      {% for rewiew in rewiews%}
-      <div class="card" style="width: 80vh; margin-top: 5vh;">
-        <div class="card-body">
-          <h5 class="card-title">Автор {{ rewiew.email }}</h5>
-          <h6 class="card-subtitle mb-2 text-body-secondary">{{ rewiew.rate }}</h6>
-          <p class="card-text">{{ rewiew.detail }}</p>
+        {% for rewiew in rewiews%}
+        <div class="card" style="width: 80vh; margin-top: 5vh;">
+            <div class="card-body">
+                <h5 class="card-title">Автор {{ rewiew.email }}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">{{ rewiew.rate }}</h6>
+                <p class="card-text">{{ rewiew.detail }}</p>
+            </div>
         </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
     </div>
-  </div>
+</div>
+{% endblock %}
 
 
-</main>
-
-
-
-
-<footer class="container">
-
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-</body>
-</html>

@@ -1,24 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from main import *
-from models import Chamomile, Users, Review
-from werkzeug.security import generate_password_hash, check_password_hash
+from main import app, db, tmp_users, processed_pay, email
+from flask import request, redirect, flash
+from src.models import Chamomile, Users, Review
+from werkzeug.security import check_password_hash
 import stripe
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
-
-
-@app.route("/")  # Вказуємо url-адресу для виклику функції
-def index():
-    with app.app_context():
-        return render_template('index.html', cards=Chamomile.query.all())  # Результат, що повертається у браузер
-
-
-@app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
-def product(id):
-    with app.app_context():
-        review = Review.query.filter_by(product_id=int(id)).all()
-        return render_template('info.html', product=Chamomile.query.get(int(id)),
-                               rewiews=review)  # Результат, що повертається у браузер
 
 
 @app.route('/api/product/<id>', methods=['GET'])
@@ -56,6 +42,7 @@ def create_pay_session():
         custom_text={
             "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
         },
+        shipping_address_collection={'allowed_countries': ['UA']},
         success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=f'https://127.0.0.1:5000/'
     )
@@ -125,30 +112,3 @@ def accounts():
                         return 'BAD'
                 else:
                     return 'BAD'
-
-
-@app.route('/accounts/confirm/<email>', methods=['GET'])
-def confirm(email):
-    data = tmp_users[email]
-    with app.app_context():
-        print(data)
-        user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
-                     email=data['email'])
-        db.session.add(user)
-        db.session.commit()
-    return redirect('/accounts/signin')
-
-
-@app.route('/accounts/signin', methods=['GET'])
-def signin():
-    return render_template('signin.html')
-
-
-@app.route('/accounts/signup', methods=["GET"])
-def signup():
-    return render_template('signup.html')
-
-
-@app.route("/checkout/<id>")
-def checkout(id):
-    return render_template('checkout.html', product=Chamomile.query.get(int(id)))

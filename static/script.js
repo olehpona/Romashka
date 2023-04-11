@@ -46,6 +46,7 @@ async function GetPay(id, pic, name) {
                     },
                     body: await JSON.stringify(data_list)
                 });
+                //document.getElementById('bk_body').innerHTML = '';sessionStorage.setItem('Basket', JSON.stringify({'basket': []}))
                 window.location.replace(await response.text())
             }
         }
@@ -79,13 +80,15 @@ function remove_product_from_busket(el) {
 
 
 function prepareBasket() {
-    var basket = document.getElementById('bk_body')
+    let basket = document.getElementById('bk_body')
     basket.innerHTML = '';
-    var product_list = JSON.parse(sessionStorage.getItem("Basket"))['basket'];
-    console.log(product_list)
-    if (product_list != 0) {
-        product_list.forEach((ob) => {
-            let child = `
+    let product_list = JSON.parse(sessionStorage.getItem("Basket"));
+    if (product_list) {
+        product_list = product_list['basket'];
+        console.log(product_list)
+        if (product_list != 0) {
+            product_list.forEach((ob) => {
+                let child = `
 <div style="display: flex; height: 20vh; max-width: 100%; padding: 10px; align-items: center;">
     <img src="${ob['img']}" width="200" height="120" style="border-radius: 25px;margin: 10px;">
     <p style="margin: 10px;">${ob['name']}</p>
@@ -94,35 +97,64 @@ function prepareBasket() {
     <button type="button" class="btn-close" aria-label="Close" onclick="remove_product_from_busket(this)" for-product="${ob['id']}"></button>
 </div>
             `;
-            basket.innerHTML += child;
-        })
-        document.getElementById('bk_btn').style.display = 'flex'
-    }   else {
-        console.log('a')
-        document.getElementById('bk_body').innerHTML = `
+                basket.innerHTML += child;
+            })
+            document.getElementById('bk_btn').style.display = 'flex'
+        } else {
+            console.log('a')
+            document.getElementById('bk_body').innerHTML = `
         <div class="alert alert-info" id="alert" role="alert">
             Упс тут пусто!
         </div>
         `
+            document.getElementById('bk_btn').style.display = 'none'
+        }
+    } else {
+        document.getElementById('bk_body').innerHTML = `
+        <div class="alert alert-info" id="alert" role="alert">
+            Упс тут пусто!
+        </div>`
         document.getElementById('bk_btn').style.display = 'none'
+
     }
 }
 
 async function addProductToBasket(id) {
-    let products = JSON.parse(sessionStorage.getItem("Basket"))['basket'];
-    let find_index = products.findIndex((ob) =>
-        ob['id'] === id
-    )
+    let products = JSON.parse(sessionStorage.getItem("Basket"));
+    if (products) {
+        products = products['basket'];
+        let find_index = products.findIndex((ob) =>
+            ob['id'] === id
+        )
 
-    if (find_index !== -1) {
-        products[find_index] = {
-            img: products[find_index]['img'],
-            name: products[find_index]['name'],
-            price: products[find_index]['price'],
-            id: products[find_index]['id'],
-            count: Number(products[find_index]['count']) + 1
+        if (find_index !== -1) {
+            products[find_index] = {
+                img: products[find_index]['img'],
+                name: products[find_index]['name'],
+                price: products[find_index]['price'],
+                id: products[find_index]['id'],
+                count: Number(products[find_index]['count']) + 1
+            }
+
+        } else {
+            const response = await fetch(`/api/product/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            let json = await response.json();
+            let data = {
+                img: json['img'],
+                name: json['name'],
+                price: json['price'],
+                id: json['id'],
+                count: 1
+            }
+            await products.push(data)
+            console.log(products)
         }
-
+        sessionStorage.setItem('Basket', JSON.stringify({'basket': products}))
     } else {
         const response = await fetch(`/api/product/${id}`, {
             method: 'GET',
@@ -131,17 +163,16 @@ async function addProductToBasket(id) {
             }
         })
         let json = await response.json();
-        let data = {
-            img: json['img'],
-            name: json['name'],
-            price: json['price'],
-            id: json['id'],
-            count: 1
-        }
-        await products.push(data)
-        console.log(products)
+        sessionStorage.setItem('Basket', JSON.stringify({
+            'basket': [{
+                img: json['img'],
+                name: json['name'],
+                price: json['price'],
+                id: json['id'],
+                count: 1
+            }]
+        }))
     }
-    sessionStorage.setItem('Basket', JSON.stringify({'basket': products}))
     prepareBasket()
 }
 
@@ -246,7 +277,7 @@ function changeService() {
 function sendReview(id) {
     const data = {
         id: id,
-        email: document.getElementById('Email').value,
+        email: getCookie('user'),
         review: document.getElementById('detail').value,
         rate: document.getElementById('Rate').value
     };
