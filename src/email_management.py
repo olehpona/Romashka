@@ -108,5 +108,42 @@ class Mail():
             print('sended')
 
 
-if __name__ == '__main__':
-    send_mail('lanuoleg@gmail.com')
+    def send_seting_change_email(self , email , changed, secret):
+        sender_email = self.email_addr
+        receiver_email = email
+        password = self.email_pass
+
+        message = MIMEMultipart('alternative')
+        message["Subject"] = "Підтвердження змін акаунту"
+        message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
+        message["To"] = receiver_email
+        text = f"""\
+
+            """
+        html = f"""\
+        <!DOCTYPE html>
+        <html lang="en">
+        <body>
+        <main class="container">
+            <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
+                <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
+                <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
+                Ти бажаєш змінити важливі параметри акаунти, а саме {changed[0]}, {changed[1]}. Будь ласка підтверди операцію<br>
+                </p>
+                <a style="font-size: 15px;" href="https://127.0.0.1:5000/api/accounts/update/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
+            </div>
+        </main>
+        </body>
+        </html>
+            """
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+        message.attach(part1)
+        message.attach(part2)
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.ukr.net", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(
+                sender_email, receiver_email, message.as_string()
+            )
+            print('sended')

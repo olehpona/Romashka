@@ -348,13 +348,13 @@ async function getPoint(value) {
 }
 
 async function signup() {
-    user = document.getElementById('inputName').value;
-    email = document.getElementById('inputEmail').value;
-    tel = document.getElementById('inputPhone').value;
-    pass1 = document.getElementById('inputPassword').value;
-    pass2 = document.getElementById('confirmPassword').value;
-    alert = document.getElementById('alertjs')
-    if (pass1 === pass2 && user !== '' && email !== '' && tel !== '' && pass1 !== '') {
+    let user = document.getElementById('inputName').value;
+    let email = document.getElementById('inputEmail').value;
+    let tel = document.getElementById('inputPhone').value;
+    let pass1 = document.getElementById('inputPassword').value;
+    let pass2 = document.getElementById('confirmPassword').value;
+    let alert = document.getElementById('alertjs')
+    if (pass1 === pass2 && user !== '' && email !== '' && tel !== '' && pass1 !== '' && pass1.length >= 8) {
         alert.style.display = 'none';
         var data = {
             'type': 'create',
@@ -474,17 +474,16 @@ async function checkUser(mode, pass) {
                 alert.innerHTML = 'Сталася помилка на сервері. Спробуйте пізніше.'
             }
         } else {
-            let text = await JSON.parse(await response.text());
-            console.log(text)
-            if (text === 'BAD') {
+            let text = await response.json();
+            if (text['head'] === 'BAD') {
                 console.log('BAD KEY');
                 sessionStorage.removeItem("isLogged");
                 return "BAD"
             } else {
-                remember = document.getElementById('rememberMe')
+                let remember = document.getElementById('rememberMe')
                 if (remember) {
                     if (document.getElementById('rememberMe').checked) {
-                        setCookie('email', email, 20);
+                        setCookie('email', text['email'], 20);
                         setCookie('user', text['user'], 20);
                         setCookie('password', text['password'], 20);
                     }
@@ -493,7 +492,10 @@ async function checkUser(mode, pass) {
                     return "OK"
                 } else {
                     sessionStorage.setItem("isLogged", 'true');
-                    window.location.replace(window.location.origin)
+                    setCookie('email', text['email'], 20);
+                    setCookie('user', text['user'], 20);
+                    setCookie('password', text['password'], 20);
+                    window.location.reload()
                     return "OK"
                 }
             }
@@ -508,10 +510,10 @@ async function checkUser(mode, pass) {
 }
 
 function changePostService(element) {
-    if (element.selectedOptions[0].innerHTML == 'Нова Пошта') {
+    if (element.selectedOptions[0].innerHTML === 'Нова Пошта') {
         document.getElementById("NewPost").style.display = 'block';
         document.getElementById("UkrPost").style.display = 'none';
-    } else if (element.selectedOptions[0].innerHTML == 'Укр Пошта') {
+    } else if (element.selectedOptions[0].innerHTML === 'Укр Пошта') {
         document.getElementById("NewPost").style.display = 'none';
         document.getElementById("UkrPost").style.display = 'block';
     } else {
@@ -522,3 +524,79 @@ function changePostService(element) {
 
 changePostService(document.getElementById('PostService'))
 
+
+async function prepareUser() {
+    let request = {
+        email: await getCookie('email')
+    }
+    console.log(request)
+    if (sessionStorage.getItem('isLogged') === 'true') {
+        let response = await fetch('/api/accounts/get', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        })
+        console.log(response.text)
+        let data = await response.json()
+        document.getElementById('username').value = data['name'];
+        document.getElementById('useremail').value = data['email'];
+        document.getElementById('usertel').value = data['tel'];
+        let post = data['post']
+        document.getElementById('city').value = post['city'];
+        document.getElementById('addr').value = post['addr'];
+        document.getElementById('addr2').value = post['addr2'];
+        document.getElementById('postcode').value = post['code'];
+    }
+}
+
+async function saveUser() {
+    let user = document.getElementById('username').value;
+    let email = document.getElementById('useremail').value;
+    let tel = document.getElementById('usertel').value
+    if (user != '' && email != '' && tel != '') {
+        let data = {
+            user: user,
+            oldmail: getCookie('email'),
+            email: email,
+            tel: tel
+        }
+        let response = await fetch('/api/accounts/update/user/1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    } else {
+        document.getElementById('user_alert').style.display = 'block';
+        document.getElementById('user_alert').innerHTML = 'Перевірте правильність даних!';
+    }
+    sessionStorage.removeItem('isLogged')
+}
+
+async function saveUserPost() {
+    let city = document.getElementById('city').value;
+    let addr = document.getElementById('addr').value;
+    let addr1 = document.getElementById('addr1').value;
+    let code = document.getElementById('postcode').value;
+    if (city != '' && addr != '' && addr1 != '' && code != '' && code.length == 5) {
+        let data = {
+            city: city,
+            addr: addr,
+            addr1: addr1,
+            postcode: code
+        }
+        let response = await fetch('/api/accounts/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    } else {
+        document.getElementById('post_alert').style.display = 'block';
+        document.getElementById('post_alert').innerHTML = 'Перевірте правильність даних!';
+    }
+}

@@ -17,6 +17,7 @@ def index():
 @app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
 @cache.cached(timeout=50)
 def product(id):
+    print(id)
     with app.app_context():
         review = Review.query.filter_by(product_id=int(id)).all()
         return render_template('info.html', product=Chamomile.query.get(int(id)),
@@ -50,3 +51,9 @@ def signup():
 @app.route("/checkout/<id>")
 def checkout(id):
     return render_template('checkout.html', product=Chamomile.query.get(int(id)))
+
+
+@app.route('/user')
+def user():
+    return render_template('user.html')
+

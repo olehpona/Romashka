@@ -24,4 +24,5 @@ class Users(db.Model):
     password = db.Column(db.String, nullable=False)
     tel = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
+    post = db.Column(db.String)
 

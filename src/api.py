@@ -3,8 +3,18 @@ from flask import request, redirect, flash
 from src.models import Chamomile, Users, Review
 from werkzeug.security import check_password_hash
 import stripe
+import json
+import string, random
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
+
+change_confirm = {}
+
+
+def specific_string(length):
+    letters = string.ascii_lowercase
+    result = ''.join((random.choice(letters)) for x in range(length))
+    return result
 
 
 @app.route('/api/product/<id>', methods=['GET'])
@@ -96,19 +106,74 @@ def accounts():
                     if check_password_hash(Users.query.filter_by(email=data['email']).first().password,
                                            data['password']):
                         return {'password': Users.query.filter_by(email=data['email']).first().password,
-                                'user': Users.query.filter_by(email=data['email']).first().login}
+                                'user': Users.query.filter_by(email=data['email']).first().login,
+                                'email': Users.query.filter_by(email=data['email']).first().email}
                     else:
-                        return 'BAD'
+                        return {'head': 'BAD'}
                 else:
-                    return 'BAD'
+                    return {'head': 'BAD'}
         else:
             print(geted)
             with app.app_context():
                 if Users.query.filter_by(email=data['email']).first():
                     if Users.query.filter_by(email=data['email']).first().password == data['password']:
                         return {'password': Users.query.filter_by(email=data['email']).first().password,
-                                'user': Users.query.filter_by(email=data['email']).first().login}
+                                'user': Users.query.filter_by(email=data['email']).first().login,
+                                'email': Users.query.filter_by(email=data['email']).first().email}
                     else:
-                        return 'BAD'
+                        return {'head': 'BAD'}
                 else:
-                    return 'BAD'
+                    return {'head': 'BAD'}
+
+
+@app.route('/api/accounts/get', methods=['POST'])
+def get_user():
+    get = request.get_json()
+    user = Users.query.filter_by(email=get['email']).first()
+    try:
+        data = {
+            'name': user.login,
+            'email': user.email,
+            'tel': user.tel,
+            'post': json.loads(user.post)
+        }
+    except:
+        data = {
+            'name': user.login,
+            'email': user.email,
+            'tel': user.tel,
+            'post': {}
+        }
+    return data
+
+
+@app.route('/api/accounts/update/user/<id>', methods=['POST', 'GET'])
+def update_user(id):
+    if request.method == 'POST':
+        data = request.get_json()
+        user = Users.query.filter_by(email=data['oldmail']).first()
+        if user.email != data['email']:
+            secret = specific_string(512)
+            email.send_seting_change_email(data['oldmail'], ['email', ''], secret)
+            change_confirm[secret] = data
+        elif user.tel != data['tel']:
+            secret = specific_string(512)
+            email.send_seting_change_email(data['oldmail'], ['', 'tel'], secret)
+            change_confirm[secret] = data
+        elif user.email != data['email'] and user.tel != data['tel']:
+            secret = specific_string(512)
+            email.send_seting_change_email(data['oldmail'], ['email', 'tel'], secret)
+            change_confirm[secret] = data
+        else:
+            user.login = data['user']
+        return 'ok'
+    elif request.method == 'GET':
+        with app.app_context():
+            data = change_confirm[id]
+            print(data)
+            user = Users.query.filter_by(email=data['oldmail'])
+            user.email = data['email']
+            user.tel = data['tel']
+            user.login = data['user']
+            db.session.commit()
+            return redirect('/user')
