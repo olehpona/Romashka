@@ -47,6 +47,6 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
     app.jinja_env.cache = {}
-    app.run(debug=True, ssl_context=context, host='0.0.0.0', port=port)  # Запускаємо веб-сервер з цього файлу
+    app.run(debug=True, ssl_context=context, host=host, port=port)  # Запускаємо веб-сервер з цього файлу
 
 # 3270f929a4f77936d060671f12818552
