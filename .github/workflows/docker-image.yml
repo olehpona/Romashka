@@ -20,6 +20,6 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build Docker
       run: |
-             docker build . --tag ghcr.io/whyDEDUS/romashka:latest
-             docker push ghcr.io/whyDEDUS/romashka:latest
+             docker build . --tag ghcr.io/whydedus/romashka:latest
+             docker push ghcr.io/whydedus/romashka:latest
 
