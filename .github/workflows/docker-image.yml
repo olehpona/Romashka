@@ -17,7 +17,7 @@ jobs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: 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
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build Docker
       run: |
              docker build . --tag ghcr.io/whydedus/romashka:latest
