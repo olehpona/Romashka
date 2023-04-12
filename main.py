@@ -31,9 +31,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 
-
 from src.routes import *
 from src.api import *
+
 
 def run():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -41,9 +41,11 @@ def run():
     app.jinja_env.cache = {}
     app.run(debug=True, ssl_context=context, host='0.0.0.0', port=port)  # Запускаємо веб-сервер з цього файлу
 
+
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     port = int(os.environ.get('PORT', 5000))
+    host = os.environ.get('HOST', '0.0.0.0')
     app.jinja_env.cache = {}
     app.run(debug=True, ssl_context=context, host='0.0.0.0', port=port)  # Запускаємо веб-сервер з цього файлу
 
