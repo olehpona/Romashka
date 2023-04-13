@@ -33,8 +33,8 @@ class Mail():
     <main class="container">
         <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
             <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
-            <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
-            Ти бажав зареєструватися на нашім сайті, хіба ні?<br>
+            <p style="font-size: 15px;">Привіт! Як справи?<br>
+            Ти бажав зареєструватися на нашому сайті, хіба ні?<br>
             </p>
             <a style="font-size: 15px;" href="{self.host}/accounts/confirm/{email}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
         </div>
@@ -75,7 +75,7 @@ class Mail():
         <main class="container">
             <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
                 <img src="https://cdn-icons-png.flaticon.com/512/3081/3081822.png" alt="Logo">
-                <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
+                <p style="font-size: 15px;">Привіт! Як справи?<br>
                 Ти зробив покупку на нашому сайті:<br>
                 </p>
             """
@@ -128,10 +128,88 @@ class Mail():
         <main class="container">
             <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
                 <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
-                <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
-                Ти бажаєш змінити важливі параметри акаунти, а саме {changed[0]}, {changed[1]}. Будь ласка підтверди операцію<br>
+                <p style="font-size: 15px;">Привіт! Як справи?<br>
+                Ти бажаєш змінити важливі параметри акаунту, а саме {changed[0]} {changed[1]}. Будь ласка підтверди операцію<br>
                 </p>
                 <a style="font-size: 15px;" href="{self.host}/api/accounts/update/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
+            </div>
+        </main>
+        </body>
+        </html>
+            """
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+        message.attach(part1)
+        message.attach(part2)
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.ukr.net", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(
+                sender_email, receiver_email, message.as_string()
+            )
+            print('sended')
+    def send_password_change_email(self , email , secret):
+        sender_email = self.email_addr
+        receiver_email = email
+        password = self.email_pass
+        print(self.host)
+        message = MIMEMultipart('alternative')
+        message["Subject"] = "Підтвердження змін паролю"
+        message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
+        message["To"] = receiver_email
+        text = f"""\
+
+            """
+        html = f"""\
+        <!DOCTYPE html>
+        <html lang="en">
+        <body>
+        <main class="container">
+            <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
+                <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
+                <p style="font-size: 15px;">Привіт! Як справи?<br>
+                Ти бажаєш змінити пароль акаунту. Ось посилання для зміни.<br>
+                </p>
+                <a style="font-size: 15px;" href="{self.host}/api/accounts/update/password/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для зміни</a>
+            </div>
+        </main>
+        </body>
+        </html>
+            """
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+        message.attach(part1)
+        message.attach(part2)
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.ukr.net", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(
+                sender_email, receiver_email, message.as_string()
+            )
+            print('sended')
+    def send_user_del_email(self , email , secret):
+        sender_email = self.email_addr
+        receiver_email = email
+        password = self.email_pass
+        print(self.host)
+        message = MIMEMultipart('alternative')
+        message["Subject"] = "Підтвердження змін паролю"
+        message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
+        message["To"] = receiver_email
+        text = f"""\
+
+            """
+        html = f"""\
+        <!DOCTYPE html>
+        <html lang="en">
+        <body>
+        <main class="container">
+            <div style="background-color: cornsilk; border-radius: 25px; width:fit-content; height:fit-content; text-align: center;">
+                <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png" alt="Logo">
+                <p style="font-size: 15px;">Привіт! Як справи?<br>
+                Ти бажаєш видалити акаунт☹️. Ось посилання для підтвердження:<br>
+                </p>
+                <a style="font-size: 15px;" href="{self.host}/api/accounts/del/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для зміни</a>
             </div>
         </main>
         </body>

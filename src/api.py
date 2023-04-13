@@ -1,7 +1,7 @@
 from main import app, db, tmp_users, processed_pay, email
 from flask import request, redirect, flash
 from src.models import Chamomile, Users, Review
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash , generate_password_hash
 import stripe
 import json
 import string, random
@@ -205,3 +205,17 @@ def update_user_post():
         user.post = json.dumps(data['post'])
         db.session.commit()
         return 'OK'
+
+@app.route('/api/accounts/update/password/secret/<secret>' , methods=['POST' , 'GET'])
+def update_password(secret):
+    if request.method == 'POST':
+        data = request.get_json()
+        secrets = specific_string(512)
+        pass_reset[secrets] = data
+        email.send_password_change_email(data['email'],secrets)
+    else:
+        data = pass_reset[secret]
+        with app.app_context():
+            user = Users.query.filter_by(email=data['email']).first()
+            user.password = generate_password_hash(data['password'])
+            db.session.commit()
