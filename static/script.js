@@ -18,6 +18,7 @@ async function GetPay(id, pic, name) {
             // Submit the payment form for Portmone.
             var data = {
                 id: id,
+                email : getCookie('email'),
                 count: document.getElementById('count').value.toString()
             }
             var response = await fetch('/api/pay', {
@@ -35,16 +36,17 @@ async function GetPay(id, pic, name) {
                 iframe.style.display = 'block';
                 iframe.src = 'https://www.youtube.com/embed/YRvOePz2OqQ?autoplay=1';
             } else {
-                var data_list = []
+                let data_list = []
                 let product_list = JSON.parse(await sessionStorage.getItem("Basket"))['basket'];
                 await product_list.forEach(ob => data_list.push(ob));
-                console.log(data_list)
+                let data = {email: getCookie('email') , product: data_list}
+                console.log(data)
                 var response = await fetch('/api/pay', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: await JSON.stringify(data_list)
+                    body: JSON.stringify(data)
                 });
                 //document.getElementById('bk_body').innerHTML = '';sessionStorage.setItem('Basket', JSON.stringify({'basket': []}))
                 window.location.replace(await response.text())
@@ -502,8 +504,6 @@ async function checkUser(mode, pass) {
         }
     } else {
         if (alert) {
-            alert.style.display = 'block';
-            alert.innerHTML = 'Користувача не знайдено!'
             return "BAD"
         }
     }
@@ -538,16 +538,22 @@ async function prepareUser() {
             },
             body: JSON.stringify(request)
         })
-        console.log(response.text)
         let data = await response.json()
         document.getElementById('username').value = data['name'];
         document.getElementById('useremail').value = data['email'];
         document.getElementById('usertel').value = data['tel'];
         let post = data['post']
-        document.getElementById('city').value = post['city'];
-        document.getElementById('addr').value = post['addr'];
-        document.getElementById('addr2').value = post['addr2'];
-        document.getElementById('postcode').value = post['code'];
+        if (post['city']) {
+            document.getElementById('city').value = post['city'];
+            document.getElementById('addr').value = post['addr'];
+            document.getElementById('addr2').value = post['addr2'];
+            document.getElementById('postcode').value = post['postcode'];
+        } else {
+            document.getElementById('city').value = '';
+            document.getElementById('addr').value = '';
+            document.getElementById('addr2').value = '';
+            document.getElementById('postcode').value = '';
+        }
     }
 }
 
@@ -579,24 +585,34 @@ async function saveUser() {
 async function saveUserPost() {
     let city = document.getElementById('city').value;
     let addr = document.getElementById('addr').value;
-    let addr1 = document.getElementById('addr1').value;
+    let addr1 = document.getElementById('addr2').value;
     let code = document.getElementById('postcode').value;
-    if (city != '' && addr != '' && addr1 != '' && code != '' && code.length == 5) {
+    if (city != '' && addr != '' && addr1 != '' && code != '' && code.length == 5 && !isNaN(code)) {
+        console.log(Number(code))
         let data = {
-            city: city,
-            addr: addr,
-            addr1: addr1,
-            postcode: code
+            email: getCookie('email'),
+            post: {
+                city: city,
+                addr: addr,
+                addr2: addr1,
+                postcode: code
+            }
         }
-        let response = await fetch('/api/accounts/update', {
+        let response = await fetch('/api/accounts/update/post', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         })
+        window.location.reload()
     } else {
-        document.getElementById('post_alert').style.display = 'block';
-        document.getElementById('post_alert').innerHTML = 'Перевірте правильність даних!';
+        if (code.length != 5 || isNaN(code)) {
+            document.getElementById('post_alert').style.display = 'block';
+            document.getElementById('post_alert').innerHTML = 'Неправильний поштовий індекс!';
+        } else {
+            document.getElementById('post_alert').style.display = 'block';
+            document.getElementById('post_alert').innerHTML = 'Заповніть усі поля!';
+        }
     }
 }

@@ -46,6 +46,7 @@ if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
+    email.host = 'https://'+'192.168.1.106'+':'+str(port)
     app.jinja_env.cache = {}
     app.run(debug=True, ssl_context=context, host=host, port=port)  # Запускаємо веб-сервер з цього файлу
 

@@ -9,7 +9,7 @@ import string, random
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
 change_confirm = {}
-
+pass_reset ={}
 
 def specific_string(length):
     letters = string.ascii_lowercase
@@ -42,20 +42,33 @@ def review(id):
 
 @app.route('/api/pay', methods=['POST'])
 def create_pay_session():
-    data = request.get_json()
-    print(data)
+    geted = request.get_json()
+    print(geted)
+    data = geted['product']
     items = [{'price': Chamomile.query.filter_by(id=i['id']).first().stripe_price, 'quantity': i['count']} for i in
              data]
-    checkout_session = stripe.checkout.Session.create(
-        line_items=items,
-        mode='payment',
-        custom_text={
-            "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
-        },
-        shipping_address_collection={'allowed_countries': ['UA']},
-        success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url=f'https://127.0.0.1:5000/'
-    )
+    print(Users.query.filter_by(email=geted['email']).first().post)
+    if Users.query.filter_by(email=geted['email']).first().post != '':
+        checkout_session = stripe.checkout.Session.create(
+            line_items=items,
+            mode='payment',
+            custom_text={
+                "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
+            },
+            success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=f'https://127.0.0.1:5000/'
+        )
+    else:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=items,
+            mode='payment',
+            custom_text={
+                "submit": {"message": "Ми повідомимо тебе в будь який обставинах :)"},
+            },
+            shipping_address_collection={'allowed_countries': ['UA']},
+            success_url="https://127.0.0.1:5000/api/pay/success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=f'https://127.0.0.1:5000/'
+        )
     print(checkout_session.url)
     return checkout_session.url
 
@@ -169,11 +182,26 @@ def update_user(id):
         return 'ok'
     elif request.method == 'GET':
         with app.app_context():
-            data = change_confirm[id]
+            try:
+                data = change_confirm[id]
+            except:
+                return '''<h1>Це посилання вже використано!</h1>
+                <a href="/">Головна</a>'''
             print(data)
-            user = Users.query.filter_by(email=data['oldmail'])
+            user = Users.query.filter_by(email=data['oldmail']).first()
             user.email = data['email']
             user.tel = data['tel']
             user.login = data['user']
             db.session.commit()
-            return redirect('/user')
+            flash('Через зміну інформації про користувача був виконаний автоматичний вихід.', 'alert-danger')
+            return redirect('/')
+
+
+@app.route('/api/accounts/update/post', methods=['POST'])
+def update_user_post():
+    with app.app_context():
+        data = request.get_json()
+        user = Users.query.filter_by(email=data['email']).first()
+        user.post = json.dumps(data['post'])
+        db.session.commit()
+        return 'OK'

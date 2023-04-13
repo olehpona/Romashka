@@ -9,6 +9,7 @@ class Mail():
     def __init__(self):
         self.email_addr = ''
         self.email_pass = ''
+        self.host = ''
 
     def send_confirm_mail(self, email):
         sender_email = self.email_addr
@@ -23,7 +24,7 @@ class Mail():
         Привіт. Як ся маєш?
         Ти бажав зареєструватися на нашім сайті, хіба ні?
         Ось посилання для підтвердження:
-        https://127.0.0.1:5000/accounts/confirm/{email}
+        {self.host}/accounts/confirm/{email}
         """
         html = f"""\
     <!DOCTYPE html>
@@ -35,7 +36,7 @@ class Mail():
             <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
             Ти бажав зареєструватися на нашім сайті, хіба ні?<br>
             </p>
-            <a style="font-size: 15px;" href="https://127.0.0.1:5000/accounts/confirm/{email}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
+            <a style="font-size: 15px;" href="{self.host}/accounts/confirm/{email}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
         </div>
     </main>
     </body>
@@ -112,7 +113,7 @@ class Mail():
         sender_email = self.email_addr
         receiver_email = email
         password = self.email_pass
-
+        print(self.host)
         message = MIMEMultipart('alternative')
         message["Subject"] = "Підтвердження змін акаунту"
         message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
@@ -130,7 +131,7 @@ class Mail():
                 <p style="font-size: 15px;">Привіт! Як ся маєш?<br>
                 Ти бажаєш змінити важливі параметри акаунти, а саме {changed[0]}, {changed[1]}. Будь ласка підтверди операцію<br>
                 </p>
-                <a style="font-size: 15px;" href="https://127.0.0.1:5000/api/accounts/update/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
+                <a style="font-size: 15px;" href="{self.host}/api/accounts/update/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для підтвердження</a>
             </div>
         </main>
         </body>

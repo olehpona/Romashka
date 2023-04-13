@@ -1,1 +1,26 @@
+.card {
+    width: 18rem;
+}
 
+.carousel {
+    width: 60vw;
+}
+
+#main {
+    display: flex;
+    width: 60vw;
+}
+
+@media screen and (min-width: 400px) {
+    .card {
+        width: 150%;
+    }
+
+    .carousel {
+        width: 150%;
+    }
+
+    #main {
+        display: block;
+    }
+}

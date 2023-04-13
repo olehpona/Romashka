@@ -30,7 +30,7 @@ def confirm(email):
     with app.app_context():
         print(data)
         user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
-                     email=data['email'])
+                     email=data['email'] , post='')
         db.session.add(user)
         db.session.commit()
     return redirect('/accounts/signin')
