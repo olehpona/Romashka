@@ -1,24 +1,83 @@
 {% extends 'base.html' %}
 {% block title %}Головна{% endblock %}
+{% block style %}
+<style>
+    .card {
+        width: 18rem;
+        margin-top: 2vh;
+        margin-left: 2vh;
+    }
+
+    .carousel {
+        width: 70vw;
+        height: 50vh;
+        margin: 2vh;
+    }
+
+    .cards {
+        display: flex;
+    }
+
+    @media screen and (width <= 900px) {
+        .card {
+            width: 100%;
+            margin: 5px;
+        }
+
+        .cards {
+            width: 100%;
+            display: block;
+        }
+
+        .carousel {
+            width: 100%;
+            margin: 0px;
+            margin-top: 2vh;
+            margin-bottom: 2vh;
+        }
+
+        .carousel-item {
+            height: 30vh;
+        }
+
+    }
+
+    @media screen and (width > 600px) {
+        .carousel-item {
+            height: 60vh;
+        }
+
+        .cards {
+            display: flex;
+        }
+
+        .card {
+            width: 18rem;
+            margin-top: 2vh;
+            margin-left: 2vh;
+        }
+    }
+</style>
+{% endblock %}
 {% block content %}
 {%for type, message in get_flashed_messages(True) %}
 <div class="alert alert {{type}}" id="alert" role="alert">
     {{message}}
 </div>
 {% endfor %}
-<div id="carouselExample" class="carousel slide">
-    <div class="carousel-inner" style="border-radius: 15px; margin-top: 2vh;">
+<div id="carouselExample" class="carousel slide" style="height: fit-content;   margin: auto;">
+    <div class="carousel-inner" style="border-radius: 15px; margin-top: 2vh; height: fit-content;">
         <div class="carousel-item active">
             <img src="https://greenheal.com.ua/files/uploads/romashka_lekarstvennaya.jpg" class="d-block" alt="1"
-                 style="height: 60vh; width:100%;">
+                 style="height: 100%; width:100%;">
         </div>
         <div class="carousel-item">
             <img src="https://www.harbuz.info/wp-content/uploads/2018/03/rom.jpg" class="d-block" alt="2"
-                 style="height: 60vh;width:100%;">
+                 style="height: 100%; width:100%;">
         </div>
         <div class="carousel-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Chamomile%40original_size.jpg/800px-Chamomile%40original_size.jpg"
-                 class="d-block" alt="3" style="height: 60vh;width:100%;">
+                 class="d-block" alt="3" style="height: 100%; width:100%;">
         </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
@@ -32,7 +91,7 @@
 </div>
 <div class="cards" style="display: flex; flex-wrap: wrap; justify-content: center;">
     {% for card in cards %}
-    <div class="card" style="width: 18rem; margin-top: 2vh;margin-left: 5px; margin-right: 5px;">
+    <div class="card" style="margin-bottom: 2vh;">
         <img src="{{card.pic_url}}" class="card-img-top" alt="..."
              style="height:50%;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
         <div class="card-body">

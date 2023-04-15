@@ -11,7 +11,7 @@
     width: 60vw;
 }
 
-@media screen and (min-width: 400px) {
+@media screen and (max-width: 600px) {
     .card {
         width: 150%;
     }
@@ -21,6 +21,6 @@
     }
 
     #main {
-        display: block;
+        display: inline-flex;
     }
 }

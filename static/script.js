@@ -91,10 +91,10 @@ function prepareBasket() {
         if (product_list != 0) {
             product_list.forEach((ob) => {
                 let child = `
-<div style="display: flex; height: 20vh; max-width: 100%; padding: 10px; align-items: center;">
-    <img src="${ob['img']}" width="200" height="120" style="border-radius: 25px;margin: 10px;">
-    <p style="margin: 10px;">${ob['name']}</p>
-    <p style="margin: 15px;">${ob['price']} грн</p>
+<div style="display: flex; height: fit-content; padding: 10px;max-width: 100%; align-items: center;">
+    <img src="${ob['img']}" width="200" height="120" style="width:20vw;height: 15vw;border-radius: 25px;margin: 0.8vh;;">
+    <p style="margin: 0.5vh;">${ob['name']}</p>
+    <p style="margin: 0.8vh;">${ob['price']} грн</p>
     <input id="count${ob['id']}" for-product="${ob['id']}" onchange="setCount(this)" type="number" style="max-width: 25%; margin: 10px; height:20%;" value="${ob['count']}">
     <button type="button" class="btn-close" aria-label="Close" onclick="remove_product_from_busket(this)" for-product="${ob['id']}"></button>
 </div>
