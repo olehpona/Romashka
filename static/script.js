@@ -18,7 +18,7 @@ async function GetPay(id, pic, name) {
             // Submit the payment form for Portmone.
             var data = {
                 id: id,
-                email : getCookie('email'),
+                email: getCookie('email'),
                 count: document.getElementById('count').value.toString()
             }
             var response = await fetch('/api/pay', {
@@ -39,7 +39,7 @@ async function GetPay(id, pic, name) {
                 let data_list = []
                 let product_list = JSON.parse(await sessionStorage.getItem("Basket"))['basket'];
                 await product_list.forEach(ob => data_list.push(ob));
-                let data = {email: getCookie('email') , product: data_list}
+                let data = {email: getCookie('email'), product: data_list}
                 console.log(data)
                 var response = await fetch('/api/pay', {
                     method: 'POST',
@@ -615,4 +615,17 @@ async function saveUserPost() {
             document.getElementById('post_alert').innerHTML = 'Заповніть усі поля!';
         }
     }
+}
+
+async function ressetPassword() {
+    let response = await fetch('/api/accounts/update/password/1', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: {
+            email: await getCookie('email'),
+            password : 'pass'
+        }
+    })
 }

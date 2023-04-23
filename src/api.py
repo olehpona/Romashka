@@ -208,7 +208,7 @@ def update_user_post():
         return 'OK'
 
 
-@app.route('/api/accounts/update/password/secret/<secret>', methods=['POST', 'GET'])
+@app.route('/api/accounts/update/password/<secret>', methods=['POST', 'GET'])
 def update_password(secret):
     if request.method == 'POST':
         data = request.get_json()
@@ -221,3 +221,10 @@ def update_password(secret):
             user = Users.query.filter_by(email=data['email']).first()
             user.password = generate_password_hash(data['password'])
             db.session.commit()
+
+@app.route('/api/accounts/delete', methods=['POST'])
+def delete_user():
+    data = request.get_json()
+    with app.app_context():
+        user = Users.query.filter_by(email=data['email']).first()
+        db.session.delete(user)
