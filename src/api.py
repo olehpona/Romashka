@@ -4,7 +4,8 @@ from src.models import Chamomile, Users, Review
 from werkzeug.security import check_password_hash, generate_password_hash
 import stripe
 import json
-import string, random
+import string
+import random
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
@@ -221,6 +222,7 @@ def update_password(secret):
             user = Users.query.filter_by(email=data['email']).first()
             user.password = generate_password_hash(data['password'])
             db.session.commit()
+
 
 @app.route('/api/accounts/delete', methods=['POST'])
 def delete_user():

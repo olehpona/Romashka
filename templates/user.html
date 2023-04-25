@@ -6,23 +6,29 @@
         display: flex;
         flex-wrap: nowrap;
     }
+
     #list {
         width: 20%;
     }
+
     #content {
         width: 80%;
     }
-    #setting{
+
+    #setting {
         width: 100%;
     }
+
     @media screen and (width <= 900px) {
         #list {
             width: 100%;
             margin-bottom: 2vh;
         }
+
         #content {
             width: 100%;
         }
+
         #page {
             flex-wrap: wrap;
         }
@@ -36,16 +42,20 @@
 <div id="page" class="m-2">
     <div id="list">
         <ul class="list-group">
-            <li class="list-group-item" data-bs-toggle="collapse" href="#setting" role="button"
+            <button class="list-group-item" data-bs-toggle="collapse" href="#setting" role="button"
                 aria-expanded="true" aria-controls="setting">Налаштування
-            </li>
-            <li class="list-group-item" data-bs-toggle="collapse" href="#orders" role="button"
-                aria-expanded="false" aria-controls="orders">Замовлення</li>
-            <li class="list-group-item" role="button" onclick="document.cookie = ''; sessionStorage.removeItem('isLogged')">Вийти з аккаунту</li>
+            </button>
+            <button class="list-group-item" data-bs-toggle="collapse" href="#orders" role="button"
+                aria-expanded="false" aria-controls="orders">Замовлення
+            </button>
+            <button class="list-group-item list-group-item-danger" role="button"
+                onclick='document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); sessionStorage.removeItem("isLogged")'>
+                Вийти з аккаунту
+            </button>
         </ul>
     </div>
     <div id="content" class="mx-2">
-        <div class="collapse collapse-horizontal" id="setting" data-bs-parent="#content">
+        <div class="collapse show collapse-horizontal" id="setting" data-bs-parent="#content">
             <div class="accordion multi-collapse" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
