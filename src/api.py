@@ -1,16 +1,18 @@
 from main import app, db, tmp_users, processed_pay, email
-from flask import request, redirect, flash
-from src.models import Chamomile, Users, Review
+from flask import request, redirect, flash , jsonify
+from src.models import Chamomile, Users, Review, Orders
 from werkzeug.security import check_password_hash, generate_password_hash
 import stripe
 import json
 import string
 import random
+import datetime
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
 change_confirm = {}
 pass_reset = {}
+user_del = {}
 
 
 def specific_string(length):
@@ -92,10 +94,25 @@ def pay_success():
             'pic_url': _.pic_url
         }
         products.append(data)
-    email.send_buy_mail(session['customer_details']["email"], products)
-    flash('Транс-акція пройшла успішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
-          'alert-success')
-    return redirect('/')
+        with app.app_context():
+            try:
+                sum = 0
+                for i in products:
+                    sum += int(i['price']) * int(i['quantity'])
+                order = Orders(price=sum, products=json.dumps(products), status='Обробляється',
+                               date=datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+                               user_id=Users.query.filter_by(email=session['customer_details']["email"]).first().id)
+                db.session.add(order)
+                db.session.commit()
+                email.send_buy_mail(session['customer_details']["email"], products)
+                flash('Транс-акція пройшла успішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
+                      'alert-success')
+                return redirect('/')
+            except:
+                flash('Ой, щось пішло не так',
+                      'alert-danger')
+                return redirect('/')
+
 
 
 @app.route('/api/accounts', methods=['POST', 'GET'])
@@ -195,7 +212,7 @@ def update_user(id):
             user.tel = data['tel']
             user.login = data['user']
             db.session.commit()
-            flash('Через зміну інформації про користувача був виконаний автоматичний вихід.', 'alert-danger')
+            flash('Через зміну інформації про користувача був виконаний автоматичний вихід.', 'alert-warning')
             return redirect('/')
 
 
@@ -213,20 +230,63 @@ def update_user_post():
 def update_password(secret):
     if request.method == 'POST':
         data = request.get_json()
-        secrets = specific_string(512)
-        pass_reset[secrets] = data
-        email.send_password_change_email(data['email'], secrets)
+        print(data)
+        if Users.query.filter_by(email=data['email']).first():
+            secrets = specific_string(512)
+            pass_reset[secrets] = data
+            email.send_password_change_email(data['email'], secrets)
+            return 'OK'
+        else:
+            return 'BAD'
     else:
         data = pass_reset[secret]
         with app.app_context():
             user = Users.query.filter_by(email=data['email']).first()
             user.password = generate_password_hash(data['password'])
+            pass_reset.pop(secret)
             db.session.commit()
+        flash('Через зміну пароля був виконаний аботоматичний вихід.', 'alert-warning')
+        return redirect('/')
 
 
-@app.route('/api/accounts/delete', methods=['POST'])
-def delete_user():
+@app.route('/api/accounts/delete/<secret>', methods=['POST', 'GET'])
+def delete_user(secret):
+    if request.method == 'POST':
+        data = request.get_json()
+        print(data)
+        if Users.query.filter_by(email=data['email']).first():
+            secrets = specific_string(512)
+            user_del[secrets] = data
+            email.send_user_del_email(data['email'], secrets)
+            return 'OK'
+        else:
+            return 'BAD'
+    else:
+        data = user_del[secret]
+        with app.app_context():
+            user = Users.query.filter_by(email=data['email']).first()
+            db.session.delete(user)
+            user_del.pop(secret)
+            db.session.commit()
+        flash('Через видалення аккаунту був виконаний аботоматичний вихід.', 'alert-warning')
+        return redirect('/')
+
+
+@app.route('/api/accounts/get/orders', methods=['POST'])
+def get_orders():
     data = request.get_json()
-    with app.app_context():
-        user = Users.query.filter_by(email=data['email']).first()
-        db.session.delete(user)
+    user = Users.query.filter_by(email=data['email']).first()
+    print(user.orders)
+    try:
+        orders = []
+        for i in user.orders:
+            orders.append({
+                'price': i.price,
+                'date': i.date,
+                'status': i.status,
+                'id': i.id,
+                'products': json.loads(i.products)
+            })
+        return orders
+    except:
+        return '[]'

@@ -617,15 +617,113 @@ async function saveUserPost() {
     }
 }
 
-async function ressetPassword() {
-    let response = await fetch('/api/accounts/update/password/1', {
+async function resetPassword() {
+    let pass = document.getElementById('pass').value;
+    let passc = document.getElementById('passc').value;
+    sessionStorage.removeItem('isLogged');
+    if (pass === passc && pass.length >= 8) {
+        let response = await fetch('/api/accounts/update/password/1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: document.getElementById('inputEmail').value,
+                password: pass
+            })
+        })
+        if (await response.text() === 'OK') {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('success').innerHTML = 'Лист з підтвердженням відправлено на скриньку';
+        } else {
+            document.getElementById('err').style.display = 'block';
+            document.getElementById('err').innerHTML = 'Ой, щось пішло не так!';
+        }
+    } else {
+        document.getElementById('err').style.display = 'block';
+        document.getElementById('err').innerHTML = 'Перевірте правильність написання пароля!';
+    }
+}
+
+async function userDel() {
+    let response = await fetch('/api/accounts/delete/1', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: {
-            email: await getCookie('email'),
-            password : 'pass'
+        body: JSON.stringify({
+            email: getCookie('email')
+        })
+    })
+    sessionStorage.removeItem('isLogged');
+    if (await response.text() === 'OK') {
+        document.getElementById('securrity_succes').style.display = 'block';
+        document.getElementById('securrity_succes').innerHTML = 'Лист з підтвердженням відправлено на скриньку';
+    } else {
+        document.getElementById('securrity_alert').style.display = 'block';
+        document.getElementById('securrity_alert').innerHTML = 'Ой, щось пішло не так!';
+    }
+}
+
+async function prepare_order_list() {
+    let response = await fetch('/api/accounts/get/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: getCookie('email')
+        })
+    })
+    let parent = document.getElementById('orders');
+    parent.innerHTML = '';
+    let data = await response.json()
+    data.forEach(element => {
+        function generate_accordion(products){
+            console.log(products)
+            let list = `<div class="accordion-body"><ul class="list-group">`
+            products.forEach(element => {
+                list += `
+                <li class="list-group-item card text-center m-2" style="height:40vh; width:100%;">
+                <div class="card-body d-flex" style="height:100%; widht:100%;">
+                    <img class="card-img" src="${element.pic_url}" alt="Card image cap" style="height:80%; width:40%;">
+                    <div class="mx-5">
+                        <p class="card-text">Ціна за одиницю: ${element.price} грн</p>
+                        <p class="card-text">Кількість: ${element.quantity}</p>
+                        <p class="card-text">Сума: ${Number(element.price) * Number(element.quantity)} грн</p>
+                    </div>
+                </div>
+            </li>
+                `
+            })
+            list += `</ul></div>`
+            console.log(list)
+            return list
         }
+        parent.innerHTML += `
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                <div class="d-flex" style="width:100%">
+                    <div style="flex: 1 1 33.3%">
+                        Статус: ${element.status}
+                    </div>
+                    <div style="flex: 1 1 33.3%">
+                        Сума: ${element.price}
+                    </div>
+                    <div style="flex: 1 1 33.3%">
+                        Дата: ${element.date}
+                    </div>                                        
+                </div>
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
+              <div class="accordion-body">
+                ${generate_accordion(element['products'])}
+              </div>
+            </div>
+          </div>
+        `
     })
 }

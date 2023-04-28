@@ -193,7 +193,7 @@ class Mail():
         password = self.email_pass
         print(self.host)
         message = MIMEMultipart('alternative')
-        message["Subject"] = "Підтвердження змін паролю"
+        message["Subject"] = "Підтвердження видаллення аккаунту"
         message["From"] = formataddr((str(Header('Твій завод "Тюльпанчик"', 'utf-8')), sender_email))
         message["To"] = receiver_email
         text = f"""\
@@ -209,7 +209,7 @@ class Mail():
                 <p style="font-size: 15px;">Привіт! Як справи?<br>
                 Ти бажаєш видалити акаунт☹️. Ось посилання для підтвердження:<br>
                 </p>
-                <a style="font-size: 15px;" href="{self.host}/api/accounts/del/user/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для зміни</a>
+                <a style="font-size: 15px;" href="{self.host}/api/accounts/delete/{secret}" class="btn btn-info" style="margin: 10px;">Це посилання для зміни</a>
             </div>
         </main>
         </body>

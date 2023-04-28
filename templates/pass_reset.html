@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Скидання пароля{% endblock %}
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="alert alert-success" id="success" style="display: none" role="alert">
+    </div>
+    <div class="alert alert-danger" id="err" style="display: none" role="alert">
+    </div>
+    <form>
+        <h3 class="mb-3">Скидання пароля</h3>
+        <div class="mb-3">
+            <label for="inputEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="inputEmail" placeholder="Введіть email">
+        </div>
+        <div class="mb-3">
+            <label for="pass" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="pass" placeholder="Введіть пароль">
+        </div>
+        <div class="mb-3">
+            <label for="passc" class="form-label">Підвердження пароля</label>
+            <input type="password" class="form-control" id="passc" placeholder="Підтвердіть пароль">
+        </div>
+        <button type="button" onclick="resetPassword()" class="btn btn-primary">Відправити посилання для скидання</button>
+    </form>
+    <div id="redirect" class="mt-3">
+        <a href="/accounts/signin">Увійти до акаунту</a> або <a href="/accounts/signup">створіть новий акаунт</a>
+    </div>
+</div>
+<script>
+    function prepare_page_password_reset() {
+        if (sessionStorage.getItem('isLogged')) {
+            document.getElementById('redirect').style.display = 'none';
+        }
+    }
+
+    prepare_page_password_reset()
+</script>
+{% endblock %}

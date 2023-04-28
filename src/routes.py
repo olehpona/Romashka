@@ -34,6 +34,9 @@ def confirm(email):
         db.session.add(user)
         db.session.commit()
     return redirect('/accounts/signin')
+@app.route('/accounts/passwordreset', methods=['GET'])
+def passwordresset():
+    return render_template('pass_reset.html')
 
 
 @app.route('/accounts/signin', methods=['GET'])

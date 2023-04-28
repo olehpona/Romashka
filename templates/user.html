@@ -38,18 +38,19 @@
 {% block content %}
 <script>
     prepareUser();
+    prepare_order_list();
 </script>
 <div id="page" class="m-2">
     <div id="list">
         <ul class="list-group">
             <button class="list-group-item" data-bs-toggle="collapse" href="#setting" role="button"
-                aria-expanded="true" aria-controls="setting">Налаштування
+                    aria-expanded="true" aria-controls="setting">Налаштування
             </button>
             <button class="list-group-item" data-bs-toggle="collapse" href="#orders" role="button"
-                aria-expanded="false" aria-controls="orders">Замовлення
+                    aria-expanded="false" aria-controls="orders">Замовлення
             </button>
             <button class="list-group-item list-group-item-danger" role="button"
-                onclick='document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); sessionStorage.removeItem("isLogged")'>
+                    onclick='document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); sessionStorage.removeItem("isLogged")'>
                 Вийти з аккаунту
             </button>
         </ul>
@@ -132,13 +133,18 @@
                         </button>
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="alert alert-danger m-3" id="securrity_alert" style="display:none">
+                            TEXT
+                        </div>
+                        <div class="alert alert-success m-3" id="securrity_succes" style="display:none">
+                            TEXT
+                        </div>
                         <div class="accordion-body">
                             <div class="form-floating mb-3">
-                                <button class="btn btn-outline-warning">Скинути пароль</button>
+                                <a href="/accounts/passwordreset" class="btn btn-outline-warning">Скинути пароль</a>
                             </div>
                             <div class="form-floating mb-3">
-                                <button class="btn btn-outline-danger" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal">
+                                <button onclick="userDel()" class="btn btn-outline-danger">
                                     Видалити акаунт
                                 </button>
                             </div>
@@ -148,30 +154,10 @@
             </div>
         </div>
         <div class="collapse collapse-horizontal multi-collapse" id="orders" data-bs-parent="#content">
-            Привіт
+
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Видалення аккаунту</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-floating mb-3">
-                    <input type="text" id="confirm_pass" class="form-control" placeholder="Пароль">
-                    <label for="confirm_pass">Пароль</label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-                <button type="button" class="btn btn-primary">Підтвердити</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock %}

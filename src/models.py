@@ -25,4 +25,14 @@ class Users(db.Model):
     tel = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     post = db.Column(db.String)
+    orders = db.relationship('Orders', backref='user', lazy=True)
+
+class Orders(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    status = db.Column(db.String, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.Integer, nullable=False)
+    products = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+        nullable=False)
 
