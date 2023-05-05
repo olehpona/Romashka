@@ -49,22 +49,35 @@
                 <a type="button" href="/accounts/signup" class="btn btn-outline-success">Створити аккаутн</a>
             </div>
             <div id="login_user" class="nav-login" style="display:none">
+                <a class="mx-2" data-bs-toggle="collapse" href="#search" role="button" aria-expanded="false"
+                   aria-controls="search">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3917/3917132.png" width="40" height="40">
+                </a>
                 <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" onclick="prepareBasket()"
                    style="margin-right: 15px;" aria-controls="offcanvasExample">
                     <img src="https://cdn-icons-png.flaticon.com/512/3081/3081822.png" width="50" height="50">
                 </a>
                 <a href="/user">
-                    <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"
-                         width="50"
-                         height="50">
-                    <a href="/user" class="nav-link active" id="uname" aria-current="page" style="margin-top: 10%"></a>
+                    <div style="display: flex;align-items: center;">
+                        <img src="https://icons.veryicon.com/png/o/miscellaneous/two-color-icon-library/user-286.png"
+                             width="50"
+                             height="50">
+                        <a href="/user" class="nav-link active" id="uname" aria-current="page"></a>
+                    </div>
                 </a>
             </div>
         </div>
     </div>
 </nav>
+
 <main class="container-fluid">
-    <div class="offcanvas offcanvas-end"  tabindex="-1" id="offcanvasExample"
+    <div class="collapse" id="search" style="width:100%">
+        <div class="card card-body" style="width:100%; display: flex; align-items: center;">
+            <input class="form-control" type="text" style="width: 80%">
+            <button class="btn btn-outline-primary mt-2" style="width: 50%">Пошук</button>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample"
          aria-labelledby="offcanvasExampleLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasExampleLabel">Кошик</h5>

@@ -1,6 +1,6 @@
-from main import app, db, tmp_users, processed_pay, email
-from flask import request, redirect, flash , jsonify
-from src.models import Chamomile, Users, Review, Orders
+from app import app, db, tmp_users, processed_pay, email
+from flask import request, redirect, flash, jsonify
+from modules.models import Chamomile, Users, Review, Orders
 from werkzeug.security import check_password_hash, generate_password_hash
 import stripe
 import json
@@ -94,25 +94,24 @@ def pay_success():
             'pic_url': _.pic_url
         }
         products.append(data)
-        with app.app_context():
-            try:
-                sum = 0
-                for i in products:
-                    sum += int(i['price']) * int(i['quantity'])
-                order = Orders(price=sum, products=json.dumps(products), status='Обробляється',
-                               date=datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
-                               user_id=Users.query.filter_by(email=session['customer_details']["email"]).first().id)
-                db.session.add(order)
-                db.session.commit()
-                email.send_buy_mail(session['customer_details']["email"], products)
-                flash('Транс-акція пройшла успішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
-                      'alert-success')
-                return redirect('/')
-            except:
-                flash('Ой, щось пішло не так',
-                      'alert-danger')
-                return redirect('/')
-
+    with app.app_context():
+        try:
+            sum = 0
+            for i in products:
+                sum += int(i['price']) * int(i['quantity'])
+            order = Orders(price=sum, products=json.dumps(products), status='Обробляється',
+                           date=datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+                           user_id=Users.query.filter_by(email=session['customer_details']["email"]).first().id)
+            db.session.add(order)
+            db.session.commit()
+            email.send_buy_mail(session['customer_details']["email"], products)
+            flash('Транс-акція пройшла успішно. Після обробки на пошту вам прийде лист з деталями щодо замовлення.',
+                  'alert-success')
+            return redirect('/')
+        except:
+            flash('Ой, щось пішло не так',
+                  'alert-danger')
+            return redirect('/')
 
 
 @app.route('/api/accounts', methods=['POST', 'GET'])
@@ -290,3 +289,39 @@ def get_orders():
         return orders
     except:
         return '[]'
+
+
+@app.route('/api/product/get', methods=['POST'])
+def get_products():
+    data = request.get_json()
+    query = []
+    _ = []
+    if data['id'] == 'all':
+        for i in Chamomile.query.all():
+            query.append({
+                'name': i.name,
+                'description': i.description,
+                'price': i.price,
+                'id': i.id,
+                'pic_url': i.pic_url,
+                'filters': i.filters,
+            })
+        return query
+    else:
+        for i in data['id']:
+            _.append(Chamomile.query.get(i))
+        for i in _:
+            query.append({
+                'name': i.name,
+                'description': i.description,
+                'price': i.price,
+                'id': i.id,
+                'pic_url': i.pic_url,
+                'filters': i.filters,
+            })
+        return query
+
+
+@app.route('/api/product/filters', methods=['POST'])
+def filters():
+    return {"filters": [{"name": "bebra", "items": [{"name": '1', "type": "check"}, {"name": '2', "type": "range" , "min": 0 , "max" : 100}]}]}

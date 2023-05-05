@@ -19,7 +19,27 @@
         width: 100%;
     }
 
+    .order_product {
+        height: 100%;
+        width: 100%;
+        display: flex;
+    }
+
+    .card-img {
+        height: 30vh;
+        width: 40%;
+    }
+
     @media screen and (width <= 900px) {
+        .order_product {
+            flex-wrap: wrap;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 20vh;
+        }
+
         #list {
             width: 100%;
             margin-bottom: 2vh;
@@ -32,6 +52,7 @@
         #page {
             flex-wrap: wrap;
         }
+
     }
 </style>
 {% endblock %}
@@ -50,7 +71,7 @@
                     aria-expanded="false" aria-controls="orders">Замовлення
             </button>
             <button class="list-group-item list-group-item-danger" role="button"
-                    onclick='document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); }); sessionStorage.removeItem("isLogged")'>
+                    onclick='clearCokies()'>
                 Вийти з аккаунту
             </button>
         </ul>

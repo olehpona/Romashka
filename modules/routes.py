@@ -1,6 +1,6 @@
-from main import app, db, tmp_users, cache
+from app import app, db, tmp_users, cache
 from flask import render_template, redirect
-from src.models import Chamomile, Users, Review
+from modules.models import Chamomile, Users, Review
 from werkzeug.security import generate_password_hash
 import stripe
 
@@ -30,10 +30,12 @@ def confirm(email):
     with app.app_context():
         print(data)
         user = Users(login=data['user'], password=generate_password_hash(data['password']), tel=data['tel'],
-                     email=data['email'] , post='')
+                     email=data['email'], post='')
         db.session.add(user)
         db.session.commit()
     return redirect('/accounts/signin')
+
+
 @app.route('/accounts/passwordreset', methods=['GET'])
 def passwordresset():
     return render_template('pass_reset.html')
@@ -60,3 +62,11 @@ def checkout(id):
 def user():
     return render_template('user.html')
 
+
+@app.route('/catalog' , methods=['GET'])
+def catalog():
+    return render_template('catalog.html')
+
+@app.route('/lucky')
+def luck():
+    return 'ТИ ВИГРАВ БЕБРУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУ'

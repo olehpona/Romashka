@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import ssl
 from Cryptodome.Random import get_random_bytes
-import src.email_management as email_management
+import modules.email_management as email_management
 from flask_caching import Cache
 import flask_monitoringdashboard as dashboard
 import os
@@ -31,8 +31,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 
-from src.routes import *
-from src.api import *
+from modules.routes import *
+from modules.api import *
 
 
 def run():
@@ -50,4 +50,3 @@ if __name__ == "__main__":
     app.jinja_env.cache = {}
     app.run(debug=True, ssl_context=context, host=host, port=port)  # Запускаємо веб-сервер з цього файлу
 
-# 3270f929a4f77936d060671f12818552

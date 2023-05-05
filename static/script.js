@@ -479,7 +479,9 @@ async function checkUser(mode, pass) {
             let text = await response.json();
             if (text['head'] === 'BAD') {
                 console.log('BAD KEY');
+                clearCokies();
                 sessionStorage.removeItem("isLogged");
+                document.cookie = ''
                 return "BAD"
             } else {
                 let remember = document.getElementById('rememberMe')
@@ -507,6 +509,13 @@ async function checkUser(mode, pass) {
             return "BAD"
         }
     }
+}
+
+function clearCokies() {
+    document.cookie.split(";").forEach(function (c) {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    sessionStorage.removeItem("isLogged")
 }
 
 function changePostService(element) {
@@ -678,15 +687,16 @@ async function prepare_order_list() {
     let parent = document.getElementById('orders');
     parent.innerHTML = '';
     let data = await response.json()
+    let count = 0
     data.forEach(element => {
-        function generate_accordion(products){
+        function generate_accordion(products) {
             console.log(products)
             let list = `<div class="accordion-body"><ul class="list-group">`
             products.forEach(element => {
                 list += `
-                <li class="list-group-item card text-center m-2" style="height:40vh; width:100%;">
-                <div class="card-body d-flex" style="height:100%; widht:100%;">
-                    <img class="card-img" src="${element.pic_url}" alt="Card image cap" style="height:80%; width:40%;">
+                <li class="list-group-item card text-center m-2" >
+                <div class="card-body order_product" style="">
+                    <img class="card-img" src="${element.pic_url}" alt="Card image cap" style="">
                     <div class="mx-5">
                         <p class="card-text">Ціна за одиницю: ${element.price} грн</p>
                         <p class="card-text">Кількість: ${element.quantity}</p>
@@ -700,17 +710,21 @@ async function prepare_order_list() {
             console.log(list)
             return list
         }
+
+        parent.innerHTML += `<style>
+
+        </style>`
         parent.innerHTML += `
-        <div class="accordion" id="accordionPanelsStayOpenExample">
+        <div class="accordion my-2" id="accordionPanelsStayOpenExample">
           <div class="accordion-item">
             <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${count}" aria-expanded="false" aria-controls="${count}">
                 <div class="d-flex" style="width:100%">
                     <div style="flex: 1 1 33.3%">
                         Статус: ${element.status}
                     </div>
                     <div style="flex: 1 1 33.3%">
-                        Сума: ${element.price}
+                        Сума: ${element.price} грн
                     </div>
                     <div style="flex: 1 1 33.3%">
                         Дата: ${element.date}
@@ -718,12 +732,117 @@ async function prepare_order_list() {
                 </div>
               </button>
             </h2>
-            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
-              <div class="accordion-body">
+            <div id="${count}" class="accordion-collapse collapse">
                 ${generate_accordion(element['products'])}
-              </div>
             </div>
           </div>
         `
+        count += 1;
+
     })
+}
+
+async function getFilters() {
+    let response = await fetch('/api/product/filters', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: 'ABOBABIBABU'
+    });
+    let data = await response.json();
+    data = data['filters']
+    let parent = document.getElementById('filters');
+    data.forEach(el => {
+        let category = document.createElement('div');
+        category.className = 'accordion-item';
+        let header = document.createElement('h2');
+        header.className = 'accordion-header'
+        header.innerHTML = `
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${el['name']}" aria-expanded="false" aria-controls="${el['name']}" aria-expanded="true" aria-controls="${el['name']}">
+            ${el['name']}
+        </button>
+        `
+        let body = document.createElement('div');
+        body.id = `${el['name']}`
+        body.className = 'accordion-collapse collapse'
+        body.setAttribute('data-bs-parent' , '#filters')
+        let bodyinner = document.createElement('div');
+        bodyinner.className = 'accordion-body d-flex'
+        bodyinner.style.flexWrap= 'wrap';
+        el['items'].forEach(item => {
+            if (item['type'] === 'check') {
+                bodyinner.innerHTML += `
+                <div class="mb-3" style="width:100%;">
+                     <label" class="form-check-label" for="${item['name']}">
+                        ${item['name']}
+                    </label>
+                    <input class="form-check-input" type="checkbox" value="" id="${item['name']}">
+                </div>
+                `
+            } else if (item['type'] === 'range') {
+                bodyinner.innerHTML += `
+                <div class="mb-3" style="width:100%;">
+                     <label style="width:100%;" class="form-check-label" for="${item['name']}">
+                        ${item['name']} (${item['min']} - ${item['max']})
+                    </label>
+                    <input class="form-range" type="range" min="${item['min']}" max="${item['max']}" step="1" value="" id="${item['name']}">
+                </div>
+                `
+            } else {
+                console.clear();
+            }
+        })
+        body.appendChild(bodyinner);
+        category.appendChild(header);
+        category.appendChild(body);
+        parent.appendChild(category);
+    })
+}
+
+async function find_by_filters(filters) {
+    document.getElementById('spinner').style.display = 'block'
+    let response = await fetch('/api/product/get', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: 'all'})
+    });
+    let products = await response.json();
+    let filtered = products.filter(el => {
+        return filters.every(filter => el['filters'].includes(filter));
+    });
+    let filtered_id = filtered.map(el => el['id']);
+    console.log(filtered_id);
+    get_filtered(filtered_id);
+
+}
+
+async function get_filtered(ids) {
+    let response = await fetch('/api/product/get', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: ids})
+    })
+    let parent = document.getElementById('items')
+    parent.innerHTML = '';
+    let items = await response.json()
+    console.log(items)
+    items.forEach(el => {
+        parent.innerHTML += `
+            <div class="card" style="margin-bottom: 2vh;">
+        <img src="${el['pic_url']}" class="card-img-top" alt="..."
+             style="height:50%;border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+        <div class="card-body">
+            <h5 class="card-title">${el['name']}</h5>
+            <p class="card-text">${el['description']}</p>
+            <a href="/product/${el['id']}" class="btn btn-primary">Детальніше</a>
+        </div>
+    </div>
+        `
+    })
+    document.getElementById('spinner').style.display = 'none'
 }

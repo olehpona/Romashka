@@ -1,4 +1,5 @@
-from main import db
+from app import db
+
 
 class Chamomile(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -6,6 +7,7 @@ class Chamomile(db.Model):
     price = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text)
     type = db.Column(db.String, nullable=False)
+    filters = db.Column(db.Text)
     pic_url = db.Column(db.String)
     stripe_price = db.Column(db.String, nullable=False)
 
@@ -27,6 +29,7 @@ class Users(db.Model):
     post = db.Column(db.String)
     orders = db.relationship('Orders', backref='user', lazy=True)
 
+
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     status = db.Column(db.String, nullable=False)
@@ -34,5 +37,4 @@ class Orders(db.Model):
     date = db.Column(db.Integer, nullable=False)
     products = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-        nullable=False)
-
+                        nullable=False)
