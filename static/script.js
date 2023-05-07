@@ -753,31 +753,32 @@ async function getFilters() {
     let data = await response.json();
     data = data['filters']
     let parent = document.getElementById('filters');
+    parent.innerHTML = ``;
     data.forEach(el => {
         let category = document.createElement('div');
         category.className = 'accordion-item';
         let header = document.createElement('h2');
         header.className = 'accordion-header'
         header.innerHTML = `
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${el['name']}" aria-expanded="false" aria-controls="${el['name']}" aria-expanded="true" aria-controls="${el['name']}">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${el['name']}" aria-expanded="false" aria-controls="${el['name']}"">
             ${el['name']}
         </button>
         `
         let body = document.createElement('div');
         body.id = `${el['name']}`
         body.className = 'accordion-collapse collapse'
-        body.setAttribute('data-bs-parent' , '#filters')
+        // body.setAttribute('data-bs-parent', '#filters')
         let bodyinner = document.createElement('div');
         bodyinner.className = 'accordion-body d-flex'
-        bodyinner.style.flexWrap= 'wrap';
+        bodyinner.style.flexWrap = 'wrap';
         el['items'].forEach(item => {
             if (item['type'] === 'check') {
                 bodyinner.innerHTML += `
                 <div class="mb-3" style="width:100%;">
-                     <label" class="form-check-label" for="${item['name']}">
+                     <label class="form-check-label" for="${item['name']}">
                         ${item['name']}
                     </label>
-                    <input class="form-check-input" type="checkbox" value="" id="${item['name']}">
+                    <input class="form-check-input filter" type="checkbox" value="" id="${item['name']}">
                 </div>
                 `
             } else if (item['type'] === 'range') {
@@ -786,7 +787,7 @@ async function getFilters() {
                      <label style="width:100%;" class="form-check-label" for="${item['name']}">
                         ${item['name']} (${item['min']} - ${item['max']})
                     </label>
-                    <input class="form-range" type="range" min="${item['min']}" max="${item['max']}" step="1" value="" id="${item['name']}">
+                    <input class="form-range filter" type="range" min="${item['min']}" max="${item['max']}" step="1" value="" id="${item['name']}">
                 </div>
                 `
             } else {
@@ -800,8 +801,35 @@ async function getFilters() {
     })
 }
 
+function prepare_filters() {
+    let category = document.querySelectorAll('.accordion-collapse');
+    let filters = {};
+    category.forEach(el => {
+            let _ = []
+            el.querySelectorAll('.filter[type=checkbox]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    _.push(checkbox.id)
+                }
+            })
+            if (_ == 0) {
+                el.querySelectorAll('.filter[type=checkbox]').forEach(checkbox => {
+                    _.push(checkbox.id)
+                })
+            }
+
+            el.querySelectorAll('.filter[type=range]').forEach(range => {
+                _.push(range.id)
+            })
+            filters[el.id] = _;
+        }
+    )
+    console.log(filters)
+    find_by_filters(filters)
+}
+
 async function find_by_filters(filters) {
-    document.getElementById('spinner').style.display = 'block'
+    document.getElementById('search_alert').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
     let response = await fetch('/api/product/get', {
         method: 'POST',
         headers: {
@@ -810,23 +838,37 @@ async function find_by_filters(filters) {
         body: JSON.stringify({id: 'all'})
     });
     let products = await response.json();
+    console.log(products)
     let filtered = products.filter(el => {
-        return filters.every(filter => el['filters'].includes(filter));
+        return Object.keys(filters).every(filterName => {
+            return filters[filterName].some(filterValue => {
+                return el['filters'][filterName].includes(filterValue);
+            });
+        });
     });
-    let filtered_id = filtered.map(el => el['id']);
-    console.log(filtered_id);
-    get_filtered(filtered_id);
-
+    let filteredIds = filtered.map(el => el.id);
+    get_filtered(filteredIds);
 }
 
 async function get_filtered(ids) {
-    let response = await fetch('/api/product/get', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({id: ids})
-    })
+    let params = await new URLSearchParams(window.location.search)
+    if (params.has('name')) {
+        response = await fetch(`/api/product/get?name=${params.get('name')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: ids})
+        });
+    } else {
+        response = await fetch('/api/product/get', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: ids})
+        });
+    }
     let parent = document.getElementById('items')
     parent.innerHTML = '';
     let items = await response.json()
@@ -844,5 +886,19 @@ async function get_filtered(ids) {
     </div>
         `
     })
+    if (items.length === 0){
+        document.getElementById('search_alert').style.display = 'block';
+    }
     document.getElementById('spinner').style.display = 'none'
+}
+
+function search() {
+    let input = document.getElementById('search_input');
+    window.location.replace(`/catalog?name=${input.value}`)
+}
+function prepare_search() {
+    let input = document.getElementById('search_input');
+    if (new URLSearchParams(window.location.search).has('name')){
+        input.value = new URLSearchParams(window.location.search).get('name')
+    }
 }

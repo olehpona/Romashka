@@ -293,35 +293,65 @@ def get_orders():
 
 @app.route('/api/product/get', methods=['POST'])
 def get_products():
-    data = request.get_json()
-    query = []
-    _ = []
-    if data['id'] == 'all':
-        for i in Chamomile.query.all():
-            query.append({
-                'name': i.name,
-                'description': i.description,
-                'price': i.price,
-                'id': i.id,
-                'pic_url': i.pic_url,
-                'filters': i.filters,
-            })
-        return query
+    params = request.args.get('name')
+    if params:
+        data = request.get_json()
+        query = []
+        _ = []
+        if data['id'] == 'all':
+            for i in Chamomile.query.filter(Chamomile.name.like('%' + params + '%')).all():
+                query.append({
+                    'name': i.name,
+                    'description': i.description,
+                    'price': i.price,
+                    'id': i.id,
+                    'pic_url': i.pic_url,
+                    'filters': json.loads(i.filters),
+                })
+            return query
+        else:
+            for i in data['id']:
+                _.append(Chamomile.query.get(i))
+            for i in _:
+                query.append({
+                    'name': i.name,
+                    'description': i.description,
+                    'price': i.price,
+                    'id': i.id,
+                    'pic_url': i.pic_url,
+                    'filters': json.loads(i.filters),
+                })
+            return query
     else:
-        for i in data['id']:
-            _.append(Chamomile.query.get(i))
-        for i in _:
-            query.append({
-                'name': i.name,
-                'description': i.description,
-                'price': i.price,
-                'id': i.id,
-                'pic_url': i.pic_url,
-                'filters': i.filters,
-            })
-        return query
+        data = request.get_json()
+        query = []
+        _ = []
+        if data['id'] == 'all':
+            for i in Chamomile.query.all()[1:]:
+                query.append({
+                    'name': i.name,
+                    'description': i.description,
+                    'price': i.price,
+                    'id': i.id,
+                    'pic_url': i.pic_url,
+                    'filters': json.loads(i.filters),
+                })
+            return query
+        else:
+            for i in data['id']:
+                _.append(Chamomile.query.get(i))
+            for i in _:
+                query.append({
+                    'name': i.name,
+                    'description': i.description,
+                    'price': i.price,
+                    'id': i.id,
+                    'pic_url': i.pic_url,
+                    'filters': json.loads(i.filters),
+                })
+            return query
 
 
 @app.route('/api/product/filters', methods=['POST'])
 def filters():
-    return {"filters": [{"name": "bebra", "items": [{"name": '1', "type": "check"}, {"name": '2', "type": "range" , "min": 0 , "max" : 100}]}]}
+    return Chamomile.query.get(1).filters

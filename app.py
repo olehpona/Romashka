@@ -41,6 +41,22 @@ def run():
     app.jinja_env.cache = {}
     app.run(debug=True, ssl_context=context, host='0.0.0.0', port=port)  # Запускаємо веб-сервер з цього файлу
 
+def create_app():
+    db = SQLAlchemy()
+    app = Flask(__name__, )  # Створюємо веб–додаток Flask
+    dashboard.bind(app)
+    app.config.from_mapping(config)
+    cache = Cache(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = get_random_bytes(4096)
+    db.init_app(app)
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    port = int(os.environ.get('PORT', 5000))
+    host = os.environ.get('HOST', '0.0.0.0')
+    email.host = 'https://'+'192.168.1.106'+':'+str(port)
+    app.jinja_env.cache = {}
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True

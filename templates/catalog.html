@@ -12,6 +12,11 @@
         display: flex;
     }
 
+    #main {
+        flex-wrap: nowrap;
+        display: flex;
+    }
+
     @media screen and (width <= 900px) {
         .card {
             width: 100%;
@@ -23,18 +28,41 @@
             display: block;
         }
 
+        #main {
+            flex-wrap: wrap;
+        }
 
     }
 
 </style>
 {% endblock %}
 {% block content %}
-<div class="d-flex justify-content-center">
-  <div class="spinner-grow text-warning" id="spinner" style="display: none; height: 15rem; width: 15rem;" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
+<script>
+    getFilters();
+    get_filtered('all')
+    prepare_search()
+</script>
+<div id="main" style="height: 300vh;">
+    <div class="card" style="height: fit-content">
+        <div class="card-body">
+            <h5 class="card-title">Фільтри</h5>
+            <div class="accordion my-3" id="filters"></div>
+            <btn class="btn btn-primary" onclick="prepare_filters()">Пошук</btn>
+        </div>
+    </div>
+    <div style="width:80%;">
+        <div class="alert alert-info m-3" id="search_alert" role="alert" style="display: none; width:100%">
+            Нічого не знайдено!
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="spinner-grow text-warning" id="spinner" style="display: none; height: 15rem; width: 15rem;"
+                 role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div id="items" style="height: fit-content"></div>
+    </div>
 </div>
-<div class="accordion" id ="filters"></div>
 
-<div id="items"></div>
+
 {% endblock %}

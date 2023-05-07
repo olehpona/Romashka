@@ -11,7 +11,7 @@ stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTE
 @cache.cached(timeout=50)
 def index():
     with app.app_context():
-        return render_template('index.html', cards=Chamomile.query.all())  # Результат, що повертається у браузер
+        return render_template('index.html', cards=Chamomile.query.all()[1:])  # Результат, що повертається у браузер
 
 
 @app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
