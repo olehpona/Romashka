@@ -6,6 +6,7 @@ import modules.email_management as email_management
 from flask_caching import Cache
 import flask_monitoringdashboard as dashboard
 import os
+from flask_cors import CORS
 
 config = {'CACHE_TYPE': 'SimpleCache'}
 
@@ -30,10 +31,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
+CORS(app)
 
 from modules.routes import *
 from modules.api import *
-
+from modules.admin import *
 
 def run():
     app.config['TEMPLATES_AUTO_RELOAD'] = True

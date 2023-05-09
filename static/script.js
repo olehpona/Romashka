@@ -530,10 +530,6 @@ function changePostService(element) {
         document.getElementById("UkrPost").style.display = 'none';
     }
 }
-
-changePostService(document.getElementById('PostService'))
-
-
 async function prepareUser() {
     let request = {
         email: await getCookie('email')
@@ -753,6 +749,7 @@ async function getFilters() {
     let data = await response.json();
     data = data['filters']
     let parent = document.getElementById('filters');
+    let parent2 = document.getElementById('filters_off');
     parent.innerHTML = ``;
     data.forEach(el => {
         let category = document.createElement('div');
@@ -797,7 +794,9 @@ async function getFilters() {
         body.appendChild(bodyinner);
         category.appendChild(header);
         category.appendChild(body);
+        let category2 = category.cloneNode(true);
         parent.appendChild(category);
+        parent2.appendChild(category2);
     })
 }
 
@@ -886,7 +885,7 @@ async function get_filtered(ids) {
     </div>
         `
     })
-    if (items.length === 0){
+    if (items.length === 0) {
         document.getElementById('search_alert').style.display = 'block';
     }
     document.getElementById('spinner').style.display = 'none'
@@ -896,9 +895,65 @@ function search() {
     let input = document.getElementById('search_input');
     window.location.replace(`/catalog?name=${input.value}`)
 }
+
 function prepare_search() {
     let input = document.getElementById('search_input');
-    if (new URLSearchParams(window.location.search).has('name')){
+    if (new URLSearchParams(window.location.search).has('name')) {
         input.value = new URLSearchParams(window.location.search).get('name')
     }
+}
+
+function collectTelemetry() {
+    let currentPage = window.location.pathname;
+    const currentTime = new Date().getHours();
+    fetch('https://ipapi.co/json')
+        .then(response => response.json())
+        .then(data => {
+            ipAddress = data.ip;
+            const geoIPUrl = `https://ipapi.co/${ipAddress}/json`;
+            return fetch(geoIPUrl, {
+                method: 'GET'
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            const geo = data;
+            const isLoggedIn = sessionStorage.getItem('isLogged');
+            const areCookiesEnabled = navigator.cookieEnabled;
+            let productId = null;
+            const productUrlRegex = /\/product\/(\d+)/;
+            const match = currentPage.match(productUrlRegex);
+            if (match) {
+                currentPage = '/product/'
+                productId = match[1];
+            }
+            const telemetryData = {
+                page: currentPage,
+                hour: currentTime,
+                ip: ipAddress,
+                country: geo.country,
+                region: geo.region,
+                city: geo.city,
+                isLoggedIn: isLoggedIn,
+                areCookiesEnabled: areCookiesEnabled,
+                productId: productId,
+                id: generateUniqueId()
+            };
+            fetch('/api/telemetry/', {
+                method: 'POST',
+                body: JSON.stringify(telemetryData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error collecting telemetry:', error);
+        });
+}
+
+function generateUniqueId() {
+    const timestamp = new Date().getTime().toString(16); // отримати часову мітку та перетворити на шістнадцяткову систему числення
+    const random = Math.floor(Math.random() * 16).toString(16); // отримати випадкове число від 0 до 15 та перетворити на шістнадцяткову систему числення
+    return timestamp + random;
 }

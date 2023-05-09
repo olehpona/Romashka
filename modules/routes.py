@@ -67,6 +67,6 @@ def user():
 def catalog():
     return render_template('catalog.html')
 
-@app.route('/lucky')
-def luck():
-    return 'ТИ ВИГРАВ БЕБРУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУУ'
+# @app.route('/lucky')
+# def luck():
+#     return render_template('admin.html')

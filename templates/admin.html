@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<script src="{{  url_for('static' , filename='admin.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div id="main" style="display: flex;">
+    <div id="category" class="my-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Admin Панель</h5>
+                <div class="card-body">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Телеметрія
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show"
+                                 data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <ul class="list-group">
+                                        <button type="button" class="list-group-item list-group-item-action"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse_telemetry_1"
+                                                aria-expanded="false" aria-controls="collapse_telemetry_1"
+                                                onclick="async function a(){await new Promise(r => setTimeout(r, 1000));chartHour(); chartPage();} a(); if(document.getElementById('collaps1').style.display == 'none'){document.getElementById('collaps1').style.display = 'block'}else{document.getElementById('collaps1').style.display = 'none'}">
+                                            Використання
+                                        </button>
+                                        <button type="button" class="list-group-item list-group-item-action"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse_telemetry_2"
+                                                aria-expanded="false" aria-controls="collapse_telemetry_2"
+                                                onclick="async function a(){await new Promise(r => setTimeout(r, 1000));chartRegion(); chartCookie(); chartCountry(); chartLogged();} a(); if(document.getElementById('collaps2').style.display == 'none'){document.getElementById('collaps2').style.display = 'block'}else{document.getElementById('collaps2').style.display = 'none'}">
+                                            Користувачі
+                                        </button>
+                                        <button type="button" class="list-group-item list-group-item-action">Продукти
+                                        </button>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Керування
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse"
+                                 data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <ul class="list-group">
+                                        <button type="button" class="list-group-item list-group-item-action">Продукти
+                                        </button>
+                                        <button type="button" class="list-group-item list-group-item-action">
+                                            Користувачі
+                                        </button>
+                                        <button type="button" class="list-group-item list-group-item-action">
+                                            Замовлення
+                                        </button>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="collaps1" style="width: 100%; min-height: 100vh; display: none;">
+        <div class="collapse collapse-horizontal m-2" id="collapse_telemetry_1">
+            <div class="card card-body"
+                 style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
+                <div id="page" style="width: 50%; height:50%;">
+                    <canvas id="page_canvas"></canvas>
+                </div>
+                <div id="hous" style="width: 50%; height:50%;">
+                    <canvas id="hours_canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="collaps2" style="width: 100%; min-height: 100vh; display: none;">
+        <div class="collapse collapse-horizontal m-2" id="collapse_telemetry_2">
+            <div class="card card-body"
+                 style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
+                <div id="region" style="width: 50%; height:50%;">
+                    <canvas id="region_canvas"></canvas>
+                </div>
+                <div id="country" style="width: 50%; height:50%;">
+                    <canvas id="country_canvas"></canvas>
+                </div>
+                <div id="isLogged" style="width: 50%; height:50%;">
+                    <canvas id="loged_canvas"></canvas>
+                </div>
+                <div id="incognito" style="width: 50%; height:50%;">
+                    <canvas id="incognito_canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="collapse collapse-horizontal" id="collapse_telemetry_3">
+
+    </div>
+</div>
+{% endblock %}

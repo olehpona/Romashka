@@ -6,6 +6,7 @@
         width: 18rem;
         margin-top: 2vh;
         margin-left: 2vh;
+        height: 50vh;
     }
 
     #items {
@@ -15,6 +16,14 @@
     #main {
         flex-wrap: nowrap;
         display: flex;
+    }
+
+    #filter_card {
+        display: block;
+    }
+
+    #filter_btn {
+        display: none;
     }
 
     @media screen and (width <= 900px) {
@@ -30,6 +39,15 @@
 
         #main {
             flex-wrap: wrap;
+            height: fit-content;
+        }
+
+        #filter_card {
+            display: none;
+        }
+
+        #filter_btn {
+            display: block;
         }
 
     }
@@ -42,26 +60,40 @@
     get_filtered('all')
     prepare_search()
 </script>
-<div id="main" style="height: 300vh;">
-    <div class="card" style="height: fit-content">
+
+<div class="d-flex justify-content-center">
+    <div class="spinner-grow text-warning" id="spinner" style="display: none; height: 15rem; width: 15rem;"
+         role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<div id="main" style="height: fit-content;">
+    <button id="filter_btn" type="button" class="btn btn-outline-success my-2" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasFilter" aria-controls="offcanvasFilter" style="height:5vh; width:100%;">Фільтри
+    </button>
+    <div class="card" id="filter_card" style="height: fit-content">
         <div class="card-body">
             <h5 class="card-title">Фільтри</h5>
             <div class="accordion my-3" id="filters"></div>
             <btn class="btn btn-primary" onclick="prepare_filters()">Пошук</btn>
         </div>
     </div>
-    <div style="width:80%;">
-        <div class="alert alert-info m-3" id="search_alert" role="alert" style="display: none; width:100%">
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasFilter" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">Фільтри</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="accordion my-3" id="filters_off"></div>
+            <btn class="btn btn-primary" onclick="prepare_filters()">Пошук</btn>
+        </div>
+    </div>
+    <div  id="search_alert" style=" display: none; width:80%;">
+        <div class="alert alert-info m-3"  role="alert" style=" width:100%">
             Нічого не знайдено!
         </div>
-        <div class="d-flex justify-content-center">
-            <div class="spinner-grow text-warning" id="spinner" style="display: none; height: 15rem; width: 15rem;"
-                 role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <div id="items" style="height: fit-content"></div>
     </div>
+    <div id="items" style="height: fit-content"></div>
 </div>
 
 

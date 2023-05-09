@@ -7,6 +7,7 @@ import json
 import string
 import random
 import datetime
+import csv
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
@@ -355,3 +356,17 @@ def get_products():
 @app.route('/api/product/filters', methods=['POST'])
 def filters():
     return Chamomile.query.get(1).filters
+
+
+@app.route('/api/telemetry/', methods=['POST'])
+def telemetry():
+    json_data = request.get_json()
+    if json_data:
+        with open('data.csv', mode='a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=json_data.keys())
+            writer.writerow(json_data)
+        return 'Data saved successfully'
+    else:
+        return 'No data received'
+
+
