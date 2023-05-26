@@ -214,3 +214,86 @@ async function chartCookie() {
     });
     //chart.resize(window.innerWidth, window.innerHeight)
 }
+
+async function chartCookie() {
+    let data = await getData()
+    let pie_data = []
+    await Object.keys(data['product']).forEach(el => {
+        pie_data.push(data['product'][el])
+    })
+    const setup = {
+        labels: Object.keys(data['product']),
+        datasets: [{
+            label: 'Продукти',
+            data: pie_data,
+            fill: true,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgb(255, 99, 132)',
+            pointBackgroundColor: 'rgb(255, 99, 132)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(255, 99, 132)'
+        }]
+    };
+    const chart = new Chart(document.getElementById('product_canvas'), {
+        type: 'radar',
+        data: setup,
+        options: {
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            }
+        }
+    });
+}
+
+async function get_products(type) {
+    let response = await fetch('/admin/get_product_by', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            request_type: type,
+            id: await document.getElementById('productId').value,
+            name: await document.getElementById('productName').value,
+            price: await document.getElementById('productPrice').value
+        })
+    })
+    let ids = await response.json()
+    ids = ids['id']
+    console.log(ids)
+}
+
+function createAdmin(text) {
+    var qrcode = new QRious({
+        element: document.getElementById("qr-code"),
+        background: '#ffffff',
+        backgroundAlpha: 1,
+        foreground: '#e8ad23',
+        foregroundAlpha: 1,
+        level: 'H',
+        padding: 0,
+        size: 256,
+        value: text
+    });
+}
+
+async function validateOtp(text , callback , bad_callback){
+    let request = await fetch('/admin/otp/validate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({
+            'code' : text
+        })
+    })
+    let data = await request.text()
+    if (data === 'OK'){
+        callback();
+    } else {
+        bad_callback()
+    }
+}

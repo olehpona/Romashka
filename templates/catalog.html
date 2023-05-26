@@ -75,7 +75,7 @@
         <div class="card-body">
             <h5 class="card-title">Фільтри</h5>
             <div class="accordion my-3" id="filters"></div>
-            <btn class="btn btn-primary" onclick="prepare_filters()">Пошук</btn>
+            <btn class="btn btn-primary" onclick="prepare_filters('filters')">Пошук</btn>
         </div>
     </div>
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasFilter" aria-labelledby="offcanvasExampleLabel">
@@ -85,7 +85,7 @@
         </div>
         <div class="offcanvas-body">
             <div class="accordion my-3" id="filters_off"></div>
-            <btn class="btn btn-primary" onclick="prepare_filters()">Пошук</btn>
+            <btn class="btn btn-primary" onclick="prepare_filters('filters_off')">Пошук</btn>
         </div>
     </div>
     <div  id="search_alert" style=" display: none; width:80%;">

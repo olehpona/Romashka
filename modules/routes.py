@@ -1,4 +1,4 @@
-from app import app, db, tmp_users, cache
+from app import app, db, tmp_users
 from flask import render_template, redirect
 from modules.models import Chamomile, Users, Review
 from werkzeug.security import generate_password_hash
@@ -8,14 +8,14 @@ stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTE
 
 
 @app.route("/")  # Вказуємо url-адресу для виклику функції
-@cache.cached(timeout=50)
+#@cache.cached(timeout=50)
 def index():
     with app.app_context():
         return render_template('index.html', cards=Chamomile.query.all()[1:])  # Результат, що повертається у браузер
 
 
 @app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
-@cache.cached(timeout=50)
+#@cache.cached(timeout=50)
 def product(id):
     print(id)
     with app.app_context():
@@ -42,13 +42,13 @@ def passwordresset():
 
 
 @app.route('/accounts/signin', methods=['GET'])
-@cache.cached(timeout=50)
+#@cache.cached(timeout=50)
 def signin():
     return render_template('signin.html')
 
 
 @app.route('/accounts/signup', methods=["GET"])
-@cache.cached(timeout=50)
+#@cache.cached(timeout=50)
 def signup():
     return render_template('signup.html')
 

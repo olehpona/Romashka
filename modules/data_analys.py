@@ -73,4 +73,4 @@ def generate_statistic():
         "hours": get_hours_data()
     }
     return data
-
+print(df['productId'].value_counts())

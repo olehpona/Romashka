@@ -3,7 +3,21 @@
 {% block content %}
 <script src="{{  url_for('static' , filename='admin.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div id="main" style="display: flex;">
+<div id="login">
+    <div class="alert alert-danger" role="alert" id="validAlert" style="display:none;">
+        Код не пройшов валідацію!
+    </div>
+    <div class="mb-3">
+        <label for="otpcode" class="form-label">Код Аунтифікатора</label>
+        <input type="text" class="form-control" id="otpcode" placeholder="123456">
+    </div>
+    <button type="button" class="btn btn-outline-success m-3"
+            onclick="validateOtp(document.getElementById('otpcode').value , function(){document.getElementById('main').style.display = 'flex'; document.getElementById('login').style.display = 'none';} , function(){document.getElementById('validAlert').style.display='block';})">
+        Підтвердити
+    </button>
+
+</div>
+<div id="main" style="display: none;">
     <div id="category" class="my-2">
         <div class="card" style="width: 18rem;">
             <div class="card-body">
@@ -33,7 +47,11 @@
                                                 onclick="async function a(){await new Promise(r => setTimeout(r, 1000));chartRegion(); chartCookie(); chartCountry(); chartLogged();} a(); if(document.getElementById('collaps2').style.display == 'none'){document.getElementById('collaps2').style.display = 'block'}else{document.getElementById('collaps2').style.display = 'none'}">
                                             Користувачі
                                         </button>
-                                        <button type="button" class="list-group-item list-group-item-action">Продукти
+                                        <button type="button" class="list-group-item list-group-item-action"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse_telemetry_3"
+                                                aria-expanded="false" aria-controls="collapse_telemetry_3"
+                                                onclick="async function a(){await new Promise(r => setTimeout(r, 1000));chartRegion(); chartCookie(); chartCountry(); chartLogged();} a(); if(document.getElementById('collaps3').style.display == 'none'){document.getElementById('collaps3').style.display = 'block'}else{document.getElementById('collaps3').style.display = 'none'}">
+                                            Продукти
                                         </button>
                                     </ul>
                                 </div>
@@ -50,7 +68,11 @@
                                  data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
                                     <ul class="list-group">
-                                        <button type="button" class="list-group-item list-group-item-action">Продукти
+                                        <button type="button" class="list-group-item list-group-item-action"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse_settings1"
+                                                aria-expanded="false" aria-controls="collapse_settings1"
+                                                onclick="if(document.getElementById('setting1').style.display == 'none'){document.getElementById('setting1').style.display = 'block'}else{document.getElementById('setting1').style.display = 'none'}">
+                                            Продукти
                                         </button>
                                         <button type="button" class="list-group-item list-group-item-action">
                                             Користувачі
@@ -101,8 +123,48 @@
             </div>
         </div>
     </div>
-    <div class="collapse collapse-horizontal" id="collapse_telemetry_3">
+    <div id="collaps3" style="width: 100%; min-height: 100vh; display: none;">
+        <div class="collapse collapse-horizontal m-2" id="collapse_telemetry_3">
+            <div class="card card-body"
+                 style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
+                <div id="product" style="width: 50%; height:50%;">
+                    <canvas id="product_canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div id="setting1" style="width: 100%; min-height: 100vh; display: none;">
+        <div class="collapse collapse-horizontal m-2" id="collapse_settings1">
+            <div class="card card-body mb-3"
+                 style="width: 100%; height:fit-content; padding: 1vh; display:flex; align-items: center; justify-items: center;">
+                <div id="products-filters" style="display:flex; flex-wrap: nowrap; align-items: center">
+                    <div class="m-3">
+                        <label for="productId" class="form-label">Id</label>
+                        <input type="number" class="form-control" id="productId"
+                               placeholder="1">
+                    </div>
+                    <div class="m-3">
+                        <label for="productName" class="form-label">Назва</label>
+                        <input type="number" class="form-control" id="productName"
+                               placeholder="БоберXXX">
+                    </div>
+                    <div class="m-3">
+                        <label for="productPrice" class="form-label">Ціна</label>
+                        <input type="number" class="form-control" id="productPrice"
+                               placeholder="25">
+                    </div>
+                    <div class="m-4" style="height: fit-content;">
+                        <button type="button" class="btn btn-primary">Пошук</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-body"
+                 style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
+                <div id="products" style="display:flex; flex-wrap: nowrap;">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

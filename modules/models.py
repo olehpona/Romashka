@@ -21,7 +21,7 @@ class Review(db.Model):
 
 
 class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False ,  unique=True)
     login = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     tel = db.Column(db.String, nullable=False)

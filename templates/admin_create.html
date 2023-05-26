@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<script src="{{  url_for('static' , filename='admin.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<div style="align-items: center; display: flex; flex-wrap: nowrap; justify-content: center;">
+    <div class="card card-body m-3 d-flex" style="max-width: 50%; max-height:50%;">
+        <div style="width:70%; height:90%;text-align: center">
+            <p style="margin:3vh;">Код: <br> {{ secret }}</p>
+            <p style="margin:3vh;">Або QrCode</p>
+            <canvas id="qr-code" ></canvas>
+        </div>
+        <div>
+            <input class="form-control m-2" id="code" placeholder="Введіть код виданий аунтефікатором для підтвердження">
+            <button type="button" class="btn btn-outline-success m-3" onclick="validateOtp(document.getElementById('code').value , function(){window.location.replace('/admin')} , function (){return 'BAD'})">Підтвердити</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    createAdmin("{{ secret_url }}")
+</script>
+
+
+{% endblock %}

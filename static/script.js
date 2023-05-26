@@ -530,6 +530,7 @@ function changePostService(element) {
         document.getElementById("UkrPost").style.display = 'none';
     }
 }
+
 async function prepareUser() {
     let request = {
         email: await getCookie('email')
@@ -800,8 +801,8 @@ async function getFilters() {
     })
 }
 
-function prepare_filters() {
-    let category = document.querySelectorAll('.accordion-collapse');
+function prepare_filters(parrent_id) {
+    let category = document.getElementById(parrent_id).querySelectorAll('.accordion-collapse');
     let filters = {};
     category.forEach(el => {
             let _ = []
@@ -810,7 +811,7 @@ function prepare_filters() {
                     _.push(checkbox.id)
                 }
             })
-            if (_ == 0) {
+            if (_.length === 0) {
                 el.querySelectorAll('.filter[type=checkbox]').forEach(checkbox => {
                     _.push(checkbox.id)
                 })
@@ -844,7 +845,7 @@ async function find_by_filters(filters) {
                 return el['filters'][filterName].includes(filterValue);
             });
         });
-    });
+    })
     let filteredIds = filtered.map(el => el.id);
     get_filtered(filteredIds);
 }
