@@ -1,3 +1,6 @@
+cookie = true;
+
+
 async function GetPay(id, pic, name) {
     // Clear the payment information.
 
@@ -398,10 +401,14 @@ async function signup() {
 }
 
 function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    if (cookie) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    } else {
+        return
+    }
 }
 
 function getCookie(cname) {
@@ -581,8 +588,12 @@ async function saveUser() {
             },
             body: JSON.stringify(data)
         })
+        document.getElementById('user_alert').style.display = 'block';
+        document.getElementById('user_alert').className = 'alert alert-warning m-3';
+        document.getElementById('user_alert').innerHTML = 'Підтвердіть зміни в email';
     } else {
         document.getElementById('user_alert').style.display = 'block';
+        document.getElementById('user_alert').className = 'alert alert-danger m-3';
         document.getElementById('user_alert').innerHTML = 'Перевірте правильність даних!';
     }
     sessionStorage.removeItem('isLogged')
@@ -693,7 +704,7 @@ async function prepare_order_list() {
                 list += `
                 <li class="list-group-item card text-center m-2" >
                 <div class="card-body order_product" style="">
-                    <img class="card-img" src="${element.pic_url}" alt="Card image cap" style="">
+                    <img class="card-img" src="${JSON.parse(element.pic_url)[0]}" alt="Card image cap" style="">
                     <div class="mx-5">
                         <p class="card-text">Ціна за одиницю: ${element.price} грн</p>
                         <p class="card-text">Кількість: ${element.quantity}</p>
@@ -957,4 +968,13 @@ function generateUniqueId() {
     const timestamp = new Date().getTime().toString(16); // отримати часову мітку та перетворити на шістнадцяткову систему числення
     const random = Math.floor(Math.random() * 16).toString(16); // отримати випадкове число від 0 до 15 та перетворити на шістнадцяткову систему числення
     return timestamp + random;
+}
+
+function prepereCookieQ() {
+    if (getCookie('cookie') !== "true") {
+        let offcanvas = new bootstrap.Offcanvas(document.getElementById('cookieEnable'))
+        offcanvas.show();
+    } else {
+        setCookie('cookie', true, 20);
+    }
 }

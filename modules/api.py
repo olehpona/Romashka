@@ -27,7 +27,7 @@ def get_product(id):
     with app.app_context():
         data = Chamomile.query.get(int(id))
         sended = {
-            'img': data.pic_url,
+            'img': data.preview_pic,
             'price': data.price,
             'name': data.name,
             'id': data.id
@@ -306,7 +306,7 @@ def get_products():
                     'description': i.description,
                     'price': i.price,
                     'id': i.id,
-                    'pic_url': i.pic_url,
+                    'pic_url': i.preview_pic,
                     'filters': json.loads(i.filters),
                 })
             return query
@@ -319,7 +319,7 @@ def get_products():
                     'description': i.description,
                     'price': i.price,
                     'id': i.id,
-                    'pic_url': i.pic_url,
+                    'pic_url': i.preview_pic,
                     'filters': json.loads(i.filters),
                 })
             return query
@@ -334,7 +334,7 @@ def get_products():
                     'description': i.description,
                     'price': i.price,
                     'id': i.id,
-                    'pic_url': i.pic_url,
+                    'pic_url': i.preview_pic,
                     'filters': json.loads(i.filters),
                 })
             return query
@@ -347,7 +347,7 @@ def get_products():
                     'description': i.description,
                     'price': i.price,
                     'id': i.id,
-                    'pic_url': i.pic_url,
+                    'pic_url': i.preview_pic,
                     'filters': json.loads(i.filters),
                 })
             return query

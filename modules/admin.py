@@ -67,8 +67,8 @@ def get_products_list():
     data = request.get_json()
     query = []
     if data['request_type'] == 'all':
-        for i in Chamomile.query.get().all():
-            query.append(i.id, )
+        for i in Chamomile.query.all():
+            query.append(i.id)
         return {'id': query}
     else:
         _ = Chamomile.query.filter(Chamomile.name.like('%' + data['name'] + '%'))
@@ -81,6 +81,23 @@ def get_products_list():
         return {'id': query}
 
 
+@app.route('/admin/get_user_by', methods=["POST"])
+def get_user_list():
+    print(request.get_data())
+    data = request.get_json()
+    query = []
+    if data['request_type'] == 'all':
+        for i in Users.query.all():
+            query.append(i.id)
+        return {'id': query}
+    else:
+        _ = Users.query.filter(Users.login.like('%' + data['name'] + '%'))
+        if data['email'] != '':
+            _ = _.filter(Users.email.like('%' + data['email'] + '%'))
+        for i in _.all():
+            query.append(i.id, )
+        return {'id': query}
+
 @app.route('/admin/otp/validate' , methods=['POST'])
 def validate():
     if Users.query.filter_by(email='admin@admin.admin').first():
@@ -88,3 +105,25 @@ def validate():
     else:
         otp.dump()
     return otp.validate(request.get_json()['code'])
+
+@app.route('/admin/users/get', methods=['POST'])
+def get_users():
+    data = request.get_json()
+    query = []
+    _ = []
+    if data['id'] == 'all':
+        for i in Users.query.all():
+            query.append({
+                'name': i.login,
+                'id': i.id,
+            })
+        return query
+    else:
+        for i in data['id']:
+            _.append(Users.query.get(i))
+        for i in _:
+            query.append({
+                'name': i.login,
+                'id': i.id,
+            })
+        return query

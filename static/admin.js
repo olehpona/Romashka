@@ -264,6 +264,7 @@ async function get_products(type) {
     let ids = await response.json()
     ids = ids['id']
     console.log(ids)
+    get_by_id(ids, 'products_list', 'Редагувати', '' , 'products')
 }
 
 function createAdmin(text) {
@@ -280,20 +281,75 @@ function createAdmin(text) {
     });
 }
 
-async function validateOtp(text , callback , bad_callback){
+async function validateOtp(text, callback, bad_callback) {
     let request = await fetch('/admin/otp/validate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body : JSON.stringify({
-            'code' : text
+        body: JSON.stringify({
+            'code': text
         })
     })
     let data = await request.text()
-    if (data === 'OK'){
+    if (data === 'OK') {
         callback();
     } else {
         bad_callback()
     }
+}
+
+async function get_by_id(ids, container_id, btn_name, btn_onclik , type) {
+    let url = ''
+    if (type==='products'){
+        url = '/api/product/get'
+    } else if(type==='users'){
+        url = '/admin/users/get'
+    } else if(type==='orders'){
+        url = '/admin/orders/get'
+    }
+    response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: ids})
+    });
+    let parent = document.getElementById(container_id)
+    parent.innerHTML = '';
+    let items = await response.json()
+    console.log(items)
+    items.forEach(el => {
+        parent.innerHTML += `
+            <div class="card" style="margin-bottom: 2vh; width: 90%;">
+        <div class="card-body d-flex">
+            <h5 class="card-title m-2">${el['name']}</h5>
+            <p class="card-text m-2">Id : ${el['id']}</p>
+            <a href="/product/${el['id']}" class="btn btn-primary" onclick="${btn_onclik}" style="flex:fit-content;">${btn_name}</a>
+        </div>
+    </div>
+        `
+    })
+    if (items.length === 0) {
+        document.getElementById('search_alert').style.display = 'block';
+    }
+    //document.getElementById('spinner').style.display = 'none'
+}
+
+async function get_users(type) {
+    let response = await fetch('/admin/get_user_by', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            request_type: type,
+            name: await document.getElementById('userName').value,
+            email: await document.getElementById('userEmail').value
+        })
+    })
+    let ids = await response.json()
+    ids = ids['id']
+    console.log(ids)
+    get_by_id(ids, 'user_list' , 'Замовлення', '' , 'users')
 }

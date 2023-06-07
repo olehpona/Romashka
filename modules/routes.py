@@ -3,6 +3,7 @@ from flask import render_template, redirect
 from modules.models import Chamomile, Users, Review
 from werkzeug.security import generate_password_hash
 import stripe
+import json
 
 stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTEOJAz2Exwjok79QyWH3ADqVmFUlW8F8cA2P700cnuYTH0r"
 
@@ -11,7 +12,7 @@ stripe.api_key = "sk_test_51MuFGRFp0R5k4xMcElesPxnVhq4xOq9bZdDHwbamEOnIdXxeSebTE
 #@cache.cached(timeout=50)
 def index():
     with app.app_context():
-        return render_template('index.html', cards=Chamomile.query.all()[1:])  # Результат, що повертається у браузер
+        return render_template('index.html', cards=Chamomile.query.all()[1:] , pics=json.loads(Chamomile.query.all()[0].pic_url))  # Результат, що повертається у браузер
 
 
 @app.route("/product/<id>")  # Вказуємо url-адресу для виклику функції
@@ -21,7 +22,7 @@ def product(id):
     with app.app_context():
         review = Review.query.filter_by(product_id=int(id)).all()
         return render_template('info.html', product=Chamomile.query.get(int(id)),
-                               rewiews=review)  # Результат, що повертається у браузер
+                               rewiews=review , pics=json.loads(Chamomile.query.get(int(id)).pic_url))  # Результат, що повертається у браузер
 
 
 @app.route('/accounts/confirm/<email>', methods=['GET'])

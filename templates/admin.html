@@ -71,10 +71,13 @@
                                         <button type="button" class="list-group-item list-group-item-action"
                                                 data-bs-toggle="collapse" data-bs-target="#collapse_settings1"
                                                 aria-expanded="false" aria-controls="collapse_settings1"
-                                                onclick="if(document.getElementById('setting1').style.display == 'none'){document.getElementById('setting1').style.display = 'block'}else{document.getElementById('setting1').style.display = 'none'}">
+                                                onclick="if(document.getElementById('setting1').style.display == 'none'){document.getElementById('setting1').style.display = 'block'}else{document.getElementById('setting1').style.display = 'none'} get_products('all')">
                                             Продукти
                                         </button>
-                                        <button type="button" class="list-group-item list-group-item-action">
+                                        <button type="button" class="list-group-item list-group-item-action"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse_settings2"
+                                                aria-expanded="false" aria-controls="collapse_settings2"
+                                                onclick="if(document.getElementById('setting2').style.display == 'none'){document.getElementById('setting2').style.display = 'block'}else{document.getElementById('setting2').style.display = 'none'} get_products('all')">
                                             Користувачі
                                         </button>
                                         <button type="button" class="list-group-item list-group-item-action">
@@ -155,13 +158,41 @@
                                placeholder="25">
                     </div>
                     <div class="m-4" style="height: fit-content;">
-                        <button type="button" class="btn btn-primary">Пошук</button>
+                        <button type="button" class="btn btn-primary" onclick="get_products('search')">Пошук</button>
                     </div>
                 </div>
             </div>
-            <div class="card card-body"
+            <div id="products_list" class="card card-body"
                  style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
                 <div id="products" style="display:flex; flex-wrap: nowrap;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="setting2" style="width: 100%; min-height: 100vh; display: none;">
+        <div class="collapse collapse-horizontal m-2" id="collapse_settings2">
+            <div class="card card-body mb-3"
+                 style="width: 100%; height:fit-content; padding: 1vh; display:flex; align-items: center; justify-items: center;">
+                <div id="user-filters" style="display:flex; flex-wrap: nowrap; align-items: center">
+                    <div class="m-3">
+                        <label for="userEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="userEmail"
+                               placeholder="1">
+                    </div>
+                    <div class="m-3">
+                        <label for="userName" class="form-label">Ім'я</label>
+                        <input type="number" class="form-control" id="userName"
+                               placeholder="БоберXXX">
+                    </div>
+
+                    <div class="m-4" style="height: fit-content;">
+                        <button type="button" class="btn btn-primary" onclick="get_users('search')">Пошук</button>
+                    </div>
+                </div>
+            </div>
+            <div id="user_list" class="card card-body"
+                 style="width: 100%; min-height: 100vh; display:flex; align-items: center; justify-items: center;">
+                <div id="users" style="display:flex; flex-wrap: nowrap;">
                 </div>
             </div>
         </div>

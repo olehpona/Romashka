@@ -4,9 +4,9 @@ import ssl
 from Cryptodome.Random import get_random_bytes
 import modules.email_management as email_management
 #from flask_caching import Cache
-import flask_monitoringdashboard as dashboard
 import os
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 config = {'CACHE_TYPE': 'SimpleCache'}
 
@@ -23,15 +23,16 @@ processed_pay = {}
 db = SQLAlchemy()
 
 app = Flask(__name__, )  # Створюємо веб–додаток Flask
-dashboard.bind(app)
 app.config.from_mapping(config)
 #cache = Cache(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///chamomile.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///chamomile.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = get_random_bytes(4096)
 db.init_app(app)
 CORS(app)
+migrate = Migrate(app, db)
+
 
 from modules.routes import *
 from modules.api import *

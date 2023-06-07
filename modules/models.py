@@ -10,6 +10,7 @@ class Chamomile(db.Model):
     filters = db.Column(db.Text)
     pic_url = db.Column(db.String)
     stripe_price = db.Column(db.String, nullable=False)
+    preview_pic = db.Column(db.String);
 
 
 class Review(db.Model):
