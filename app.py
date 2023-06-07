@@ -17,7 +17,7 @@ tmp_users = {}
 email = email_management.Mail()
 email.email_addr = 'flowerfactory@ukr.net'
 email.email_pass = "uipSo7xmCozBbXdj"
-
+email.host = 'https://tulpanchik.onrender.com'
 processed_pay = {}
 
 db = SQLAlchemy()
@@ -47,7 +47,6 @@ def run():
 def create_app():
     db = SQLAlchemy()
     app = Flask(__name__, )  # Створюємо веб–додаток Flask
-    dashboard.bind(app)
     app.config.from_mapping(config)
     #cache = Cache(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
